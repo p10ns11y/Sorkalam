@@ -2,34 +2,75 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <title>சொற்களம் - wordfield</title>
+    <link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="css/popup.css">
     
-    <!-- Cordova platform API access - Uncomment this to have access to the Javascript APIs -->
-    <!-- <script src="cordova/cordova.js"></script> -->
-
-    <!-- jQuery script -->
-    <script src="jquery.min.js"></script>
+    <!-- jQuery script  jquery-1.10.2.js-->
+    <!--script src="jquery.min.js"></script>-->
+    <script src="jquery-1.10.2.js"></script>      
 
     <!-- Application script -->
     <script src="popup.js"></script>
+    
 
   </head>
 
   <body>
 
-    <div data-role="mainview">
-      <header data-role="header">
-        <ul data-role="tabs">
-         <li data-role="tabitem" data-page="main-page">சொற்களம்</li>
-        </ul>
-       </header>
-       <div data-role="content">
-         <div data-role="tab" id="main-page">
-           <div><input type="text" id="word"> </input> <button type="button" id="lookup">தேடும் சொல்</button></div>
+    <div data-role="mainview" class="background">
+        
+        <div class="logo">
+            <!--<h5>வாழ்க தமிழ் ! வாழ்க நற்றமிழர் !</h5>-->
+            <img src="logo-150-50.png" class="center" alt="சொற்களம்" title="சொற்களம்"/>
+            
+        </div> 
+        <div id="input" class="inputword">
+            <input type="text" id="word" class="col-1-full" placeholder="தமிழ்/English" />
+        </div>
+        <div id="search" class="searchbtn">              
+            <img src="imgs/googlebtn.png" class="col-1-2-right" alt="google" id="google_lookup" title="Google"/>
+            <img src="imgs/globsebtn.png" alt="Glosbe" class="col-1-2-left" id="glosbe_lookup" title="Glosbe" />       
+            <img src="imgs/wikibtn.png" class="col-1-2-left" alt="Wiki" id="wiki_lookup" title="Wikitionary"/>
+            <img src="imgs/tvubtn.png" class="col-1-2-right" alt="tvu" id="tvu_lookup" title="Tamil VU Glossary" /> 
+        </div> <!-- tab: search -->
+               
+        <div id="helpdisplay">
+            <div id="player">
+                <p id="lan_indicator" class="word_text"></p>
+                <img src="imgs/speaker.jpg" alt="speaker" title="speaker" class="word_player">
+                <audio id="play_word"></audio>           
+            </div>
 
-           <div data-role="list" id="res" />
-         </div> <!-- tab: main-page -->
-       </div><!-- content -->
-     </div><!-- mainview -->
+            <div id="genlink" class="gen-link">               
+                <div id ="newtab" class="new_tab"></div>
+            </div>  
+        </div>
+        <div id="img_results" class="imgresgrid"></div>
+        <div id = "results" class="list-result">                                    
+        </div>       
+        
+        <div id="user_tip" class="user-tip">                
+                <p id="tip">Tip #1: SELECT a word/phrase from any webpage and OPEN the extension. </p><br>
+            <p>Tip #2: OPEN the extension , TYPE a word/phrase and press ENTER* OR
+            CLICK <b>Glosbe*</b> or <b>Wiktionary</b> or <b>Tamil VU</b> or <i>Google</i>
+                    from left to right. 
+                    </p><br>
+            <p>Pro Tip: DOUBLE CLICK any word in the result of previous search for new quick search*. Wiktionary results
+            supports HYPERLINK clicks.</p><br>
+            <p>Smart Tip *:= Default = ENTER = Glosbe Search </p>
+        </div> 
+        
+        <div id="showtips" class="tips"><p id="tiptext">--{ show tips }--</p></div>
+        <div class="footer">             
+                    <!--{சொற்களம் தழீஇ[&#69666;&#69685;&#69691;&#69639;]-பெரமு}-->
+            ஆர்வலன் - பெரமு
+        </div>
+        
+   </div> <!-- background -->
+   
+      
 
   </body>
 </html>
