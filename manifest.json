@@ -12,10 +12,10 @@
    "content_security_policy": "script-src 'self' 'unsafe-eval' https://glosbe.com https://en.wiktionary.org https://ta.wiktionary.org ; object-src 'self'",
    "description": "சொற்களம்:தமிழ்\u003C->ஆங்கிலம்[கூகுள்,குளோசுப்,விக்கி,தமிழ் இணையக் கல்விக்கழக கலைச்சொற்கள் ஒருங்கிணைப்பு முயற்சி]",
    "icons": {
-      "128": "icon128px.png",
-      "16": "icon16px.png",
-      "48": "icon48px.png"
-   },
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    },
    
    "manifest_version": 2,
    "name": "Sorkalam",
