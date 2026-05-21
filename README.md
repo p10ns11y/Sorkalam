@@ -4,7 +4,7 @@
 
 > **Note**: This is a **developer/modernized version (v6.0)** primarily intended for **local testing in Brave (or Chrome) Developer Mode**. It is **not currently optimized for Chrome Web Store publication** (though it can be published later with minor changes).
 >
-> **Still on the old Web Store build (MV2)?** See [TECH_DETAILS.md — Still using Manifest V2](TECH_DETAILS.md#still-using-the-manifest-v2-v55-build) (extension ID `jacclialpnbekableeihpjnojebafhho`, archived listing, or v5.5 source at [github.com/p10ns11y/Sorkalam/tree/v5-legacy](https://github.com/p10ns11y/Sorkalam/tree/v5-legacy) in dev mode).
+> **Still on the old Web Store build (MV2)?** See [TECH_DETAILS.md — Still using Manifest V2](TECH_DETAILS.md#still-using-the-manifest-v2-v55-build) (extension ID `jacclialpnbekableeihpjnojebafhho`, archived listing, or v5.5 source at [github.com/p10ns11y/sorkalam-extension/tree/v5-legacy](https://github.com/p10ns11y/sorkalam-extension/tree/v5-legacy) in dev mode).
 
 <p align="center">
   <img src="logo-150-50.png" alt="சொற்களம் logo" width="200">
@@ -36,8 +36,8 @@ Brave is Chromium-based, so loading an unpacked extension works the same way as 
 
 1. **Get the source**
    ```bash
-   git clone <repository-url> Sorkalam
-   cd Sorkalam
+   git clone https://github.com/p10ns11y/sorkalam-extension.git
+   cd sorkalam-extension
    ```
    Or download and unzip the project. You need the folder that contains `manifest.json` at its root.
 
@@ -52,10 +52,10 @@ Brave is Chromium-based, so loading an unpacked extension works the same way as 
 
 4. **Load the extension**
    - Click **Load unpacked**
-   - In the file picker, select the **Sorkalam project folder** (the directory that contains `manifest.json`, `popup.html`, `event.js`, etc.)
+   - In the file picker, select the **sorkalam-extension** folder (the directory that contains `manifest.json`, `popup.html`, `event.js`, etc.)
    - Do **not** select a parent folder or a subfolder like `css/` — Brave needs the folder where `manifest.json` lives.
 
-   ![Select the Sorkalam folder in Load unpacked](images/brave-load-unpacked.png)
+   ![Select the sorkalam-extension folder in Load unpacked](images/brave-load-unpacked.png)
 
 5. **Pin Sorkalam to the toolbar**
    - Click the **puzzle piece** (extensions) icon in the Brave toolbar
@@ -137,7 +137,7 @@ Documentation is split by version:
 ## Project Structure
 
 ```
-Sorkalam/
+sorkalam-extension/
 ├── manifest.json          # MV3 configuration
 ├── popup.html             # Main popup UI
 ├── popup.js               # Core lookup logic
