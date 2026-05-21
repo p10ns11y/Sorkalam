@@ -143,7 +143,7 @@ Sorkalam/
 ├── content.js             # Page selection capture
 ├── css/
 │   └── popup.css          # Styling
-├── .cursor/skills/        # Agent skills (from modern-web-guidance repo)
+├── .cursor/skills/sorkalam/   # Lean Cursor skill for this extension (4 files)
 ├── docs/
 │   └── images/            # README guide illustrations
 ├── icon.png
@@ -158,14 +158,12 @@ Sorkalam/
 
 ## References
 
-This project’s v6.0 modernization drew on guidance and agent skills from Google Chrome’s **modern-web-guidance** repository:
+Development guidance for agents:
 
-- **[GoogleChrome/modern-web-guidance](https://github.com/GoogleChrome/modern-web-guidance/tree/main)** — modern web development best practices and searchable guides (forms, performance, accessibility, and related patterns).
-- Local copies used during development live under [`.cursor/skills/`](.cursor/skills/):
-  - [`modern-web-guidance`](.cursor/skills/modern-web-guidance/) — web UI and client-side JS guidance
-  - [`chrome-extensions`](.cursor/skills/chrome-extensions/) — Manifest V3 extension patterns (service worker, content scripts, messaging)
+- **In-repo (lean):** [`.cursor/skills/sorkalam/`](.cursor/skills/sorkalam/) — project skill + three MV3 reference snippets (message passing, service worker, content scripts).
+- **Upstream (link only, not vendored):** [GoogleChrome/modern-web-guidance](https://github.com/GoogleChrome/modern-web-guidance/tree/main) — full chrome-extensions skill and web UI guides; use `npx -y modern-web-guidance@latest` when you need a specific pattern.
 
-See also [TECH_DETAILS_V6.md](TECH_DETAILS_V6.md) for how these practices map to the current codebase.
+See [TECH_DETAILS_V6.md](TECH_DETAILS_V6.md) for architecture.
 
 ---
 

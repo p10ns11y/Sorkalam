@@ -159,7 +159,7 @@ popup.html     UI shell (no jQuery script tag)
 
 ## Development references
 
-v6.0 was modernized with agent skills and guides from **[GoogleChrome/modern-web-guidance](https://github.com/GoogleChrome/modern-web-guidance/tree/main)** (cloned into [`.cursor/skills/modern-web-guidance/`](.cursor/skills/modern-web-guidance/) and [`.cursor/skills/chrome-extensions/`](.cursor/skills/chrome-extensions/)). That repo informed MV3 structure (`event.js`, `content.js`, message passing), popup form behavior, and general front-end patterns.
+v6.0 follows MV3 patterns documented in [`.cursor/skills/sorkalam/`](.cursor/skills/sorkalam/) (lean, repo-specific). Broader Chrome extension and web UI guidance: **[GoogleChrome/modern-web-guidance](https://github.com/GoogleChrome/modern-web-guidance/tree/main)** (referenced by link, not copied in full).
 
 ---
 
