@@ -83,7 +83,8 @@ async function lookupTamilVU(word) {
   
   try {
     const keySel = currentLanguage === 'tamil' ? 'Tamil' : 'English';
-    const url = `http://www.tamilvu.org/slet/technical_glossary/tech_engser.jsp?key_sel=${keySel}&search=${encodeURIComponent(word)}`;
+    // https://www.tamilvu.org/slet/technical_glossary/tech_engser.jsp?selsub=All&schsel=full&editor=texture&key_sel=English
+    const url = `https://www.tamilvu.org/slet/technical_glossary/tech_engser.jsp?selsub=All&schsel=full&editor${encodeURIComponent(word)}&key_sel=${keySel}`;
     
     // Note: Direct fetch may be blocked by CORS in some cases.
     // In production, consider a lightweight proxy or use chrome.runtime.sendMessage to background.
@@ -128,29 +129,68 @@ function renderWiktionaryResults(htmlContent, word) {
 }
 
 // Render Tamil VU results
+// Tamil VU Glossary Renderer v7.2 (Smart cell detection)
 function renderTamilVUResults(html, word) {
   const resultsEl = document.getElementById('results');
   resultsEl.style.display = 'block';
-  
-  // Simple parsing (can be improved)
+
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
   const rows = doc.querySelectorAll('tr');
-  
-  let output = `<div class="result-header"><strong>${word}</strong> — Tamil VU Glossary</div><ol>`;
-  
+
+  let output = `
+    <div class="result-header">
+      <strong>${word}</strong> — Tamil VU Glossary
+    </div>
+    <ol style="padding-left:18px; margin:6px 0 0 0; line-height:1.4;">
+  `;
+
+  let found = 0;
+
   rows.forEach(row => {
-    const cells = row.querySelectorAll('td');
-    if (cells.length >= 3) {
-      const term = cells[2]?.textContent?.trim() || cells[3]?.textContent?.trim();
-      const subject = cells[1]?.textContent?.trim();
-      if (term) {
-        output += `<li>${term} <span style="color:#666; font-size:0.85em;">(${subject})</span></li>`;
-      }
+    const tds = row.querySelectorAll('td');
+    if (tds.length < 3) return;
+
+    const cellTexts = Array.from(tds).map(td => 
+      td.textContent.trim().replace(/\s+/g, ' ')
+    );
+
+    // === Term: prefer Tamil text (like v7.3), fallback to old column logic ===
+    let term = '';
+    const hasTamil = cellTexts.some(t => /[\u0B80-\u0BFF]/.test(t));
+    
+    if (hasTamil) {
+      // Find the cell with Tamil
+      term = cellTexts.find(t => /[\u0B80-\u0BFF]/.test(t)) || '';
+    } else {
+      // Fallback to old logic (column 3 or 4)
+      term = cellTexts[3] || cellTexts[4] || cellTexts[2] || '';
+    }
+
+    // === Subject: use column 2 (exactly like your old working code) ===
+    let subject = cellTexts[2] || cellTexts[1] || '';
+    // Clean volume number if present
+    subject = subject.replace(/Volume\s*-\s*\d+/i, '').trim() || subject;
+
+    // Final cleanup
+    term = term.replace(/<[^>]*>/g, '').trim();
+
+    if (term && term.length > 2 && term !== subject) {
+      output += `
+        <li style="margin-bottom: 6px;">
+          ${term} 
+          <span style="color:#666; font-size:0.82em;">{ ${subject} }</span>
+        </li>
+      `;
+      found++;
     }
   });
-  
-  output += '</ol>';
+
+  if (found === 0) {
+    output += `<li style="color:#c00;">No results parsed. Please check console.</li>`;
+  }
+
+  output += `</ol>`;
   resultsEl.innerHTML = output;
 }
 
