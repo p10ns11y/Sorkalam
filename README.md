@@ -46,14 +46,14 @@ Brave is Chromium-based, so loading an unpacked extension works the same way as 
 3. **Turn on Developer mode**
    - Use the **Developer mode** toggle in the **top-right** of the page.
 
-   ![Brave extensions page with Developer mode enabled](docs/images/brave-extensions-developer-mode.svg)
+   ![Brave extensions page with Developer mode enabled](images/brave-extensions-developer-mode.png)
 
 4. **Load the extension**
    - Click **Load unpacked**
    - In the file picker, select the **Sorkalam project folder** (the directory that contains `manifest.json`, `popup.html`, `event.js`, etc.)
    - Do **not** select a parent folder or a subfolder like `css/` — Brave needs the folder where `manifest.json` lives.
 
-   ![Select the Sorkalam folder in Load unpacked](docs/images/brave-load-unpacked.svg)
+   ![Select the Sorkalam folder in Load unpacked](images/brave-load-unpacked.png)
 
 5. **Pin Sorkalam to the toolbar**
    - Click the **puzzle piece** (extensions) icon in the Brave toolbar
@@ -96,7 +96,7 @@ The same flow applies with these URLs:
 
 **Pro tip**: Highlight a word on any webpage → open the Sorkalam popup → it fills the input and runs a Wiktionary lookup automatically.
 
-![Sorkalam popup with lookup buttons](docs/images/sorkalam-popup-usage.svg)
+![Sorkalam popup — Tamil VU Glossary results for “texture”](images/sorkalam-popup-usage.png)
 
 ### Tamil VU lookup (background fetch)
 
@@ -144,8 +144,7 @@ Sorkalam/
 ├── css/
 │   └── popup.css          # Styling
 ├── .cursor/skills/sorkalam/   # Lean Cursor skill for this extension (4 files)
-├── docs/
-│   └── images/            # README guide illustrations
+├── images/                # README screenshots (PNG)
 ├── icon.png
 ├── logo-150-50.png
 ├── TECH_DETAILS_V6.md    # v6.0 technical reference (current)
