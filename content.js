@@ -1,4 +1,7 @@
-// Send the selected text/word as a message containing the page details back to the event page
-chrome.runtime.sendMessage({
-    'word': window.getSelection().toString()
-});
+// Sorkalam - Content Script (Manifest V3)
+// Sends currently selected text when popup requests it
+
+// This runs in the context of web pages
+// Currently minimal — selection is captured directly in popup.js using chrome.scripting.executeScript
+
+console.log('[Sorkalam] Content script loaded (MV3)');

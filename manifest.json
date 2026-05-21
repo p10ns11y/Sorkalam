@@ -1,26 +1,49 @@
 {
-   "update_url": "https://clients2.google.com/service/update2/crx",
-
-   "background": {
-      "service_worker": "event.js"
-   },
-   "action": {
-      "default_icon": "icon.png",
-      "default_popup": "popup.html"
-    },
-    "content_security_policy": {
-      "extension_pages": "script-src 'self' ; object-src 'self'"
-    },
-   "description": "சொற்களம்:தமிழ்<->ஆங்கிலம்[விக்கி,தமிழ் இணையக் கல்விக்கழக கலைச்சொற்கள் ஒருங்கிணைப்பு முயற்சி]",
-   "icons": {
+  "manifest_version": 3,
+  "name": "Sorkalam",
+  "version": "6.0.0",
+  "description": "சொற்களம்: தமிழ் ↔ ஆங்கிலம் (Wiktionary + Tamil VU Glossary) - Modern Manifest V3",
+  
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
       "16": "icon.png",
       "48": "icon.png",
       "128": "icon.png"
-    },
-   
-   "manifest_version": 3,
-   "name": "Sorkalam",
-   "permissions": [ "tabs", "storage", "notifications", "scripting" ],
-   "host_permissions": [ "https://en.wiktionary.org/*", "https://ta.wiktionary.org/*", "http://*/*", "https://*/*" ],
-   "version": "5.5"
+    }
+  },
+
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+
+  "background": {
+    "service_worker": "event.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "permissions": [
+    "tabs",
+    "storage",
+    "scripting"
+  ],
+
+  "host_permissions": [
+    "https://*.wiktionary.org/*",
+    "http://www.tamilvu.org/*",
+    "https://www.tamilvu.org/*"
+  ],
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
 }

@@ -1,10 +1,14 @@
-// Called onload in the popup code
-function getPageDetails(callback) { 
-    // Inject the content script into the current page 
-    chrome.tabs.executeScript(null, { file: 'content.js' }); 
-    // Perform the callback when a message is received from the content script
-    chrome.runtime.onMessage.addListener(function(message)  { 
-        // Call the callback function
-        callback(message); 
-    }); 
-}; 
+// Sorkalam - Modern Service Worker (Manifest V3)
+// Following chrome-extensions skill best practices
+
+// Minimal background service worker
+// Handles any future message passing if needed
+
+chrome.runtime.onInstalled.addListener(() => {
+  console.log('[Sorkalam] Extension installed/updated (v6.0 - Modern MV3)');
+});
+
+// Optional: Add side panel support later if desired
+// chrome.action.onClicked.addListener(async (tab) => {
+//   await chrome.sidePanel.open({ windowId: tab.windowId });
+// });
