@@ -96,11 +96,29 @@ This document serves as an archival reference for the lookup strategies and data
 
 ### Chrome Web Store (published, then archived)
 
-**Sorkalam Version 5.5** was listed on the [Chrome Web Store](https://chrome.google.com/webstore) (created Oct 2014; last updated Feb 2023; ~8 users; 4.75 rating). The developer-dashboard entry is now under **Archived** and remains in **Draft** status.
+**Sorkalam Version 5.5** was listed on the [Chrome Web Store](https://chrome.google.com/webstore) (created Oct 2014; last updated Feb 2023; from 50+ users to ~8 users; 4.75 rating). The developer-dashboard entry is now under **Archived** and remains in **Draft** status.
 
 The store listing was not carried forward when work moved to **Manifest V3 (v6.0)** in this repository. Google requires MV3 for new extensions and updates; the MV2-based 5.5 package was archived rather than republished from the modernized tree. **v6.0** is intended for local/developer use until a new store submission is prepared.
 
 ![Chrome Web Store Developer Dashboard — Sorkalam v5.5 archived](images/chrome-web-store-v5-archived.png)
+
+### Still using the Manifest V2 (v5.5) build?
+
+If you installed **Sorkalam** from the Web Store years ago, it may still appear in the browser even though the listing is archived. On `chrome://extensions` (Brave: `brave://extensions`), look for extension ID:
+
+`jacclialpnbekableeihpjnojebafhho`
+
+The listing was archived several years ago because upgrading and maintaining a **Manifest V3** release took longer than the maintenance window allowed. Keeping the old MV2 package on the store was not viable: Chrome now requires MV3 for new extensions and updates, and the move respects the stricter security model MV3 enforces.
+
+**Options today:**
+
+| Goal | What to do |
+|------|------------|
+| Keep an old Web Store install | No new installs from the store; your existing copy may keep working until the browser drops MV2 support. |
+| Run legacy code yourself | Clone [p10ns11y/Sorkalam](https://github.com/p10ns11y/Sorkalam), check out **v5.5** at [https://github.com/p10ns11y/Sorkalam/tree/v5-legacy](https://github.com/p10ns11y/Sorkalam/tree/v5-legacy) (tag `v5-legacy`), then **Load unpacked** in Brave Developer Mode (same steps as [README.md](README.md#install-in-brave-developer-mode)). |
+| Use the modern tree | Stay on this branch (`mv3v6` / v6.0) — see [TECH_DETAILS_V6.md](TECH_DETAILS_V6.md). |
+
+The v5.5 source at [https://github.com/p10ns11y/Sorkalam/tree/v5-legacy](https://github.com/p10ns11y/Sorkalam/tree/v5-legacy) contains **no analytics or tracking code** added by the author. Any user counts or ratings shown in the Chrome Web Store developer dashboard come from **Google’s generic usage insights** for published extensions, not from custom telemetry in the extension.
 
 ---
 

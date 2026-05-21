@@ -3,6 +3,8 @@
 **Tamil ↔ English Dictionary & Technical Glossary** — Modern Manifest V3 Edition
 
 > **Note**: This is a **developer/modernized version (v6.0)** primarily intended for **local testing in Brave (or Chrome) Developer Mode**. It is **not currently optimized for Chrome Web Store publication** (though it can be published later with minor changes).
+>
+> **Still on the old Web Store build (MV2)?** See [TECH_DETAILS.md — Still using Manifest V2](TECH_DETAILS.md#still-using-the-manifest-v2-v55-build) (extension ID `jacclialpnbekableeihpjnojebafhho`, archived listing, or v5.5 source at [github.com/p10ns11y/Sorkalam/tree/v5-legacy](https://github.com/p10ns11y/Sorkalam/tree/v5-legacy) in dev mode).
 
 <p align="center">
   <img src="logo-150-50.png" alt="சொற்களம் logo" width="200">
