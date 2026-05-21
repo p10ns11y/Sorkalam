@@ -144,7 +144,7 @@ Sorkalam/
 ├── css/
 │   └── popup.css          # Styling
 ├── .cursor/skills/sorkalam/   # Lean Cursor skill for this extension (4 files)
-├── images/                # README screenshots (PNG)
+├── images/                # README screenshots and store archive (PNG)
 ├── icon.png
 ├── logo-150-50.png
 ├── TECH_DETAILS_V6.md    # v6.0 technical reference (current)

@@ -92,6 +92,18 @@ This document serves as an archival reference for the lookup strategies and data
 
 ---
 
+## References
+
+### Chrome Web Store (published, then archived)
+
+**Sorkalam Version 5.5** was listed on the [Chrome Web Store](https://chrome.google.com/webstore) (created Oct 2014; last updated Feb 2023; ~8 users; 4.75 rating). The developer-dashboard entry is now under **Archived** and remains in **Draft** status.
+
+The store listing was not carried forward when work moved to **Manifest V3 (v6.0)** in this repository. Google requires MV3 for new extensions and updates; the MV2-based 5.5 package was archived rather than republished from the modernized tree. **v6.0** is intended for local/developer use until a new store submission is prepared.
+
+![Chrome Web Store Developer Dashboard — Sorkalam v5.5 archived](images/chrome-web-store-v5-archived.png)
+
+---
+
 ## See also
 
 | Document | Contents |

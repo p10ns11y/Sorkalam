@@ -168,5 +168,5 @@ v6.0 follows MV3 patterns documented in [`.cursor/skills/sorkalam/`](.cursor/ski
 | Document | Contents |
 |----------|----------|
 | [README.md](README.md) | Features, Brave developer install, usage, references |
-| [TECH_DETAILS.md](TECH_DETAILS.md) | Legacy v5.x Glosbe, Google, MV2 architecture |
+| [TECH_DETAILS.md](TECH_DETAILS.md) | Legacy v5.x; [Chrome Web Store archive note](TECH_DETAILS.md#references) (v5.5 published, archived for MV3) |
 | [CHANGELOG.md](CHANGELOG.md) | Version history |
