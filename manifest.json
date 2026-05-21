@@ -1,24 +1,26 @@
 {
-"update_url": "https://clients2.google.com/service/update2/crx",
+   "update_url": "https://clients2.google.com/service/update2/crx",
 
    "background": {
-      "persistent": false,
-      "scripts": [ "event.js" ]
+      "service_worker": "event.js"
    },
-   "browser_action": {
+   "action": {
       "default_icon": "icon.png",
       "default_popup": "popup.html"
-   },
-   "content_security_policy": "script-src 'self' 'unsafe-eval' https://glosbe.com https://en.wiktionary.org https://ta.wiktionary.org ; object-src 'self'",
-   "description": "சொற்களம்:தமிழ்\u003C->ஆங்கிலம்[கூகுள்,குளோசுப்,விக்கி,தமிழ் இணையக் கல்விக்கழக கலைச்சொற்கள் ஒருங்கிணைப்பு முயற்சி]",
+    },
+    "content_security_policy": {
+      "extension_pages": "script-src 'self' 'unsafe-eval' https://glosbe.com https://en.wiktionary.org https://ta.wiktionary.org ; object-src 'self'"
+    },
+   "description": "சொற்களம்:தமிழ்<->ஆங்கிலம்[கூகுள்,குளோசுப்,விக்கி,தமிழ் இணையக் கல்விக்கழக கலைச்சொற்கள் ஒருங்கிணைப்பு முயற்சி]",
    "icons": {
       "16": "icon.png",
       "48": "icon.png",
       "128": "icon.png"
     },
    
-   "manifest_version": 2,
+   "manifest_version": 3,
    "name": "Sorkalam",
-   "permissions": [ "tabs", "https://glosbe.com/", "http://*/*", "https://*/*", "https://en.wiktionary.org/", "https://ta.wiktionary.org/", "gcm", "storage", "notifications", "fontSettings" ],
+   "permissions": [ "tabs", "storage", "notifications" ],
+   "host_permissions": [ "https://glosbe.com/*", "https://en.wiktionary.org/*", "https://ta.wiktionary.org/*", "http://*/*", "https://*/*" ],
    "version": "5.5"
 }
