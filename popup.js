@@ -84,7 +84,7 @@ async function lookupTamilVU(word) {
   try {
     const keySel = currentLanguage === 'tamil' ? 'Tamil' : 'English';
     // https://www.tamilvu.org/slet/technical_glossary/tech_engser.jsp?selsub=All&schsel=full&editor=texture&key_sel=English
-    const url = `https://www.tamilvu.org/slet/technical_glossary/tech_engser.jsp?selsub=All&schsel=full&editor${encodeURIComponent(word)}&key_sel=${keySel}`;
+    const url = `https://www.tamilvu.org/slet/technical_glossary/tech_engser.jsp?selsub=All&schsel=full&editor=${encodeURIComponent(word)}&key_sel=${keySel}`;
     
     // Note: Direct fetch may be blocked by CORS in some cases.
     // In production, consider a lightweight proxy or use chrome.runtime.sendMessage to background.
