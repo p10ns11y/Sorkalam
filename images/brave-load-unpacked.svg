@@ -4,7 +4,7 @@
   <rect x="120" y="40" width="480" height="320" rx="10" fill="#fff" stroke="#c4c7cc" stroke-width="2"/>
   <text x="144" y="72" font-family="system-ui,sans-serif" font-size="14" font-weight="bold" fill="#1a1a1a">Select the extension directory</text>
   <rect x="144" y="88" width="432" height="28" rx="4" fill="#f8f9fa" stroke="#dadce0"/>
-  <text x="156" y="107" font-family="ui-monospace,monospace" font-size="11" fill="#444">/path/to/Sorkalam</text>
+  <text x="156" y="107" font-family="ui-monospace,monospace" font-size="11" fill="#444">/path/to/sorkalam-extension</text>
   <rect x="144" y="128" width="432" height="180" fill="#fafafa" stroke="#e8eaed"/>
   <text x="160" y="156" font-family="ui-monospace,monospace" font-size="12" fill="#666">css/</text>
   <text x="160" y="180" font-family="ui-monospace,monospace" font-size="12" fill="#666">docs/</text>

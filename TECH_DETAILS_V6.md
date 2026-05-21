@@ -168,5 +168,5 @@ v6.0 follows MV3 patterns documented in [`.cursor/skills/sorkalam/`](.cursor/ski
 | Document | Contents |
 |----------|----------|
 | [README.md](README.md) | Features, Brave developer install, usage, references |
-| [TECH_DETAILS.md](TECH_DETAILS.md) | Legacy v5.5 — [tree/v5-legacy](https://github.com/p10ns11y/Sorkalam/tree/v5-legacy), [MV2 user notes](TECH_DETAILS.md#still-using-the-manifest-v2-v55-build) |
+| [TECH_DETAILS.md](TECH_DETAILS.md) | Legacy v5.5 — [tree/v5-legacy](https://github.com/p10ns11y/sorkalam-extension/tree/v5-legacy), [MV2 user notes](TECH_DETAILS.md#still-using-the-manifest-v2-v55-build) |
 | [CHANGELOG.md](CHANGELOG.md) | Version history |

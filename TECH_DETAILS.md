@@ -115,10 +115,10 @@ The listing was archived several years ago because upgrading and maintaining a *
 | Goal | What to do |
 |------|------------|
 | Keep an old Web Store install | No new installs from the store; your existing copy may keep working until the browser drops MV2 support. |
-| Run legacy code yourself | Clone [p10ns11y/Sorkalam](https://github.com/p10ns11y/Sorkalam), check out **v5.5** at [https://github.com/p10ns11y/Sorkalam/tree/v5-legacy](https://github.com/p10ns11y/Sorkalam/tree/v5-legacy) (tag `v5-legacy`), then **Load unpacked** in Brave Developer Mode (same steps as [README.md](README.md#install-in-brave-developer-mode)). |
+| Run legacy code yourself | Clone [p10ns11y/sorkalam-extension](https://github.com/p10ns11y/sorkalam-extension), check out **v5.5** at [https://github.com/p10ns11y/sorkalam-extension/tree/v5-legacy](https://github.com/p10ns11y/sorkalam-extension/tree/v5-legacy) (tag `v5-legacy`), then **Load unpacked** in Brave Developer Mode (same steps as [README.md](README.md#install-in-brave-developer-mode)). |
 | Use the modern tree | Stay on this branch (`mv3v6` / v6.0) — see [TECH_DETAILS_V6.md](TECH_DETAILS_V6.md). |
 
-The v5.5 source at [https://github.com/p10ns11y/Sorkalam/tree/v5-legacy](https://github.com/p10ns11y/Sorkalam/tree/v5-legacy) contains **no analytics or tracking code** added by the author. Any user counts or ratings shown in the Chrome Web Store developer dashboard come from **Google’s generic usage insights** for published extensions, not from custom telemetry in the extension.
+The v5.5 source at [https://github.com/p10ns11y/sorkalam-extension/tree/v5-legacy](https://github.com/p10ns11y/sorkalam-extension/tree/v5-legacy) contains **no analytics or tracking code** added by the author. Any user counts or ratings shown in the Chrome Web Store developer dashboard come from **Google’s generic usage insights** for published extensions, not from custom telemetry in the extension.
 
 ---
 
