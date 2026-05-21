@@ -3,8 +3,6 @@
  * email  : sathyam[dot]peram[at]gmail.com
  **/
 
-google = 0;
-glosbe = 0;
 wiki = 0;
 tvu = 0;
 newURL ="";
@@ -56,28 +54,28 @@ $( document ).ready(function () {
     });
     
     chrome.runtime.getBackgroundPage(function(eventPage) {
-        if(smartLook === "") eventPage.getPageDetails(onPageDetailsReceived);       
-    });
-       
-    $('.list-result').dblclick(function(e){
-        var mouseSelectedTxt = window.getSelection().toString();
-        document.getElementById('word').value = mouseSelectedTxt;
-        smartLook = filter(mouseSelectedTxt);
-        glosbe = 1;
-        glosbeLookup(smartLook);    
-        document.getElementById('word').focus();
-    });
+function onPageDetailsReceived(pageDetails)  { 
+    var selectedPageTxt = pageDetails.word ;
+    smartLook = filter(selectedPageTxt) ;
+    document.getElementById('word').value = smartLook;    
+    if(smartLook !== ""){             
+        newURL = "http://ta.wiktionary.org/wiki/" + smartLook;
+        console.log(newURL);
+        wiki = 1;
+        wikiRawParse(smartLook); 
+    }    
+}
     
     $(document).keydown(function(e){
         keys[e.keyCode] = true;         
         var enteredTxt = document.getElementById('word').value;
         smartLook = filter(enteredTxt);        
         if(keys[13] && smartLook != ""){ 
-            newURL = "https://glosbe.com/" + frm + "/" + des + "/" + smartLook;
+            newURL = "http://ta.wiktionary.org/wiki/" + smartLook;
             document.getElementById('word').value = smartLook;            
-            glosbe = 1;
-            glosbeLookup(smartLook); 
-        }        
+            wiki = 1;
+            wikiRawParse(smartLook); 
+        }
         else if(keys[190] && keys[83]){ // . + s = TVU search
            // tvusetup();        
         }
@@ -92,21 +90,6 @@ $( document ).ready(function () {
     $(document).keyup(function(e){
         keys[e.keyCode] = false;     
     });    
-    
-    $("#google_lookup").click(function() { 
-        google = 1;
-        smartLook = filter(document.getElementById('word').value);
-        //if(language === 'tamil') smartLook +='+e';
-        newURL = "https://www.google.com/search?q=" + smartLook.replace(/\s/gi,'+');        
-        googleBetaTrans(smartLook);
-    });    
-    
-    $("#glosbe_lookup").click(function(){        
-        smartLook = filter(document.getElementById('word').value);
-        newURL = "https://glosbe.com/" + frm + "/" + des + "/" + smartLook;
-        glosbe =1;
-        glosbeLookup(smartLook);	
-    });        
     
     $("#wiki_lookup").click(function(){  
         smartLook = filter(document.getElementById('word').value);
@@ -160,12 +143,12 @@ function onPageDetailsReceived(pageDetails)  {
     smartLook = filter(selectedPageTxt) ;
     document.getElementById('word').value = smartLook;    
     if(smartLook !== ""){             
-        newURL = "https://glosbe.com/" + frm + "/" + des + "/" + smartLook;
+        newURL = "http://ta.wiktionary.org/wiki/" + smartLook;
         console.log(newURL);
-        glosbe = 1;
-        glosbeLookup(smartLook); 
+        wiki = 1;
+        wikiRawParse(smartLook); 
     }    
-} 
+}
 
 filter = function(lookup){        
     lookup === ""? document.getElementById('word').value:lookup;  
@@ -204,70 +187,6 @@ filter = function(lookup){
     console.log(lookup);
     return lookup;
 
-}
-
-function googleBetaTrans(lookup){ 
-    if(lookup !== ''){
-        var url = newURL;
-        $.ajax({
-             type: 'GET',
-             url: url,
-             success: result        
-        });
-    }   
-    else{
-        $('#helpdisplay').hide();
-        document.getElementById('results').innerHTML = "<p>No Results Found !</p>";
-    }
-}
-
-
-function glosbeLookup(lookup){
-    if(lookup !== ''){ 
-        if(language === 'tamil'){
-            from = "ta", dest ="eng";
-        }
-        else if(language === 'english'){
-            from = "eng", dest ="ta";    
-        }
-        else{
-         var data = '';
-        }
-
-        var baseGlsbeURL = "https://glosbe.com/gapi/translate?from=" + from + "&dest="+ dest + "&format=json&phrase=";   
-        var url =  baseGlsbeURL + lookup + "&callback=result&pretty=true";
-        console.log(url);	 
-        $.ajax({
-             type: 'GET',
-             url: url,
-             success: result,
-             dataType: 'jsonp',
-             contentType: "application/json"
-        }); 
-    }
-    else{
-        $('#helpdisplay').hide();
-        document.getElementById('results').innerHTML = "<p>No Results Found !</p>";
-    }
-}
-
-function wikiSmartTrans(lookup){    
-    console.log('AJAX send to Wikitionary');
-    var baseURL = 'https://en.wiktionary.org/w/api.php';
-    
-    $.ajax({
-        url: baseURL,
-        data: {
-            action: 'query',
-            prop: 'iwlinks',
-            format: 'json',
-            iwlimit: 30,
-            iwprefix: des,            
-            titles: lookup
-        },
-        dataType: 'jsonp',
-        success: result
-    });    
 }
 
 function wikiRawParse(lookup){
@@ -352,28 +271,6 @@ function result( data ){
         var hypLink = '';    
         var elRes = '';       
 
-        if(google === 1){        
-            //console.log(data);
-            elRes = "<p>Google translation API is not free anymore ! $20/Million characters ! Wait until I can afford !</p>";
-            document.getElementById('results').innerHTML = elRes ; 
-            var smartURL = "http://www.google.com/?#q=";
-            var betaTans = "";
-            console.log(smartLook);
-
-            if(frm === "en"){
-                betaTans = "translate+english+to+tamil+" + smartLook.replace(/\s/gi,'+');       
-            }
-            else{
-                betaTans = "translate+tamil+to+english+" + smartLook.replace(/\s/gi,'+');         
-            }        
-            smartURL += betaTans;  
-            //console.log(smartURL);
-            hypLink = '<a href =' + newURL + ' class="new_tab">விரிவாக@GeneralGoogling=></a>';
-            hypLink += '<br><a href =' + smartURL + ' class="new_tab">விரிவாக@GoogleTranslate=></a>';
-            headEl.innerHTML = hypLink;        
-            
-            google = 0;                     
-        }    
 
         if(wiki === 1) { 
             hypLink = '<a href =' + newURL + ' data-role="button">விரிவாக @ Wikitionary=></a>'; 
@@ -440,47 +337,6 @@ function result( data ){
             tvu = 0;           
         }   
 
-        if(glosbe === 1) { 
-            elRes = '';
-            var glosbeURL = "https://glosbe.com/" + frm + "/" + des + "/" + smartLook;
-            hypLink = '<a href =' + glosbeURL + '>விரிவாக @ glosbe =></a>';
-            headEl.innerHTML = hypLink;        
-            for( var i = 0; i < data.tuc.length; i++ ) {
-                if ( data.tuc[i].phrase ) {                
-                        if( data.tuc[i].phrase.language === des ){
-                            elRes += '<li>' + data.tuc[i].phrase.text + '</li>';
-                        }
-                    }
-            }
-            for( var idx1 = 0; idx1 < data.tuc.length; idx1++ ) {
-                if ( data.tuc[idx1].meanings ) {                
-                    for (var idx2 = 0; idx2 < data.tuc[idx1].meanings.length; idx2++) {         
-                        if( data.tuc[idx1].meanings[idx2].language === des){
-                            elRes += '<li>' + data.tuc[idx1].meanings[idx2].text + '</li>';
-                        }
-                    }
-                }
-            }       
-            
-            if(elRes) elRes += '</ul><ul>';
-            
-            for( var idx1 = 0; idx1 < data.tuc.length; idx1++ ) {
-                if ( data.tuc[idx1].meanings ) {               
-                    for (var idx2 = 0; idx2 < data.tuc[idx1].meanings.length; idx2++) {         
-                        if( data.tuc[idx1].meanings[idx2].language === frm){
-                            elRes += '<li>' + data.tuc[idx1].meanings[idx2].text + '</li>';
-                        }
-                    }
-                }
-            }  
-
-            document.getElementById('results').innerHTML = '<ul>' + elRes + '</ul>';
-
-            glosbe = 0;  
-
-        }
-        
-        if(!elRes) document.getElementById('results').innerHTML = "<p>No Results Found !</p>"; 
     }
     else{
         $('#user_tip').hide();
@@ -488,4 +344,5 @@ function result( data ){
         document.getElementById('results').innerHTML = "<p>No Results Found !</p>";    
     }    
     
+}
 }

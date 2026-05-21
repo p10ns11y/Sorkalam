@@ -9,9 +9,9 @@
       "default_popup": "popup.html"
     },
     "content_security_policy": {
-      "extension_pages": "script-src 'self' 'unsafe-eval' https://glosbe.com https://en.wiktionary.org https://ta.wiktionary.org ; object-src 'self'"
+      "extension_pages": "script-src 'self' 'unsafe-eval' https://en.wiktionary.org https://ta.wiktionary.org ; object-src 'self'"
     },
-   "description": "சொற்களம்:தமிழ்<->ஆங்கிலம்[கூகுள்,குளோசுப்,விக்கி,தமிழ் இணையக் கல்விக்கழக கலைச்சொற்கள் ஒருங்கிணைப்பு முயற்சி]",
+   "description": "சொற்களம்:தமிழ்<->ஆங்கிலம்[விக்கி,தமிழ் இணையக் கல்விக்கழக கலைச்சொற்கள் ஒருங்கிணைப்பு முயற்சி]",
    "icons": {
       "16": "icon.png",
       "48": "icon.png",
@@ -21,6 +21,6 @@
    "manifest_version": 3,
    "name": "Sorkalam",
    "permissions": [ "tabs", "storage", "notifications" ],
-   "host_permissions": [ "https://glosbe.com/*", "https://en.wiktionary.org/*", "https://ta.wiktionary.org/*", "http://*/*", "https://*/*" ],
+   "host_permissions": [ "https://en.wiktionary.org/*", "https://ta.wiktionary.org/*", "http://*/*", "https://*/*" ],
    "version": "5.5"
 }
