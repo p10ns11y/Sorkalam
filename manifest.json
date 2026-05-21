@@ -34,12 +34,12 @@
   "permissions": [
     "tabs",
     "storage",
-    "scripting"
+    "scripting",
+    "activeTab"
   ],
 
   "host_permissions": [
     "https://*.wiktionary.org/*",
-    "http://www.tamilvu.org/*",
     "https://www.tamilvu.org/*"
   ],
 

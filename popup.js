@@ -42,6 +42,33 @@ function setLanguageDirection(text) {
   return lang;
 }
 
+/** Trim; lowercase English/Latin input (Tamil VU expects e.g. editor=texture). */
+function normalizeInput(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return '';
+  if (detectLanguage(trimmed) === 'english') {
+    return trimmed.toLowerCase();
+  }
+  return trimmed;
+}
+
+// Ask the service worker (Promise API; callback form can hang if sendResponse is late)
+async function sendMessageAsync(message, timeoutMs = 30000) {
+  const responsePromise = chrome.runtime.sendMessage(message);
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('Request timed out')), timeoutMs);
+  });
+
+  const response = await Promise.race([responsePromise, timeoutPromise]);
+
+  if (response === undefined) {
+    throw new Error(
+      'No response from background. Reload the extension at brave://extensions.'
+    );
+  }
+  return response;
+}
+
 // Modern fetch helper with proper error handling
 async function fetchJSON(url) {
   try {
@@ -76,26 +103,34 @@ async function lookupWiktionary(word) {
   }
 }
 
-// Tamil VU Glossary lookup
-async function lookupTamilVU(word) {
+// Tamil VU technical glossary lookup
+async function lookupTamilVUGlossary(searchWord) {
   const statusEl = document.getElementById('status');
   statusEl.textContent = 'Searching Tamil VU Glossary...';
-  
+
   try {
-    const keySel = currentLanguage === 'tamil' ? 'Tamil' : 'English';
-    // https://www.tamilvu.org/slet/technical_glossary/tech_engser.jsp?selsub=All&schsel=full&editor=texture&key_sel=English
-    const url = `https://www.tamilvu.org/slet/technical_glossary/tech_engser.jsp?selsub=All&schsel=full&editor=${encodeURIComponent(word)}&key_sel=${keySel}`;
-    
-    // Note: Direct fetch may be blocked by CORS in some cases.
-    // In production, consider a lightweight proxy or use chrome.runtime.sendMessage to background.
-    const response = await fetch(url);
-    const html = await response.text();
-    
-    renderTamilVUResults(html, word);
+    const glossarySearchColumn =
+      currentLanguage === 'tamil' ? 'Tamil' : 'English';
+
+    const glossaryResponse = await sendMessageAsync(
+      {
+        action: 'fetchTamilVUGlossary',
+        searchWord,
+        glossarySearchColumn,
+      },
+      90000
+    );
+    if (!glossaryResponse?.ok) {
+      const lookupError = new Error(glossaryResponse?.error || 'Glossary fetch failed');
+      lookupError.glossarySearchUrl = glossaryResponse?.glossarySearchUrl;
+      throw lookupError;
+    }
+
+    renderTamilVUGlossary(glossaryResponse.glossaryEntries, searchWord);
     statusEl.textContent = '';
-  } catch (error) {
-    statusEl.textContent = 'Tamil VU lookup failed (CORS or network issue)';
-    console.error(error);
+  } catch (lookupError) {
+    statusEl.textContent = lookupError.message;
+    console.error(lookupError);
   }
 }
 
@@ -120,92 +155,67 @@ function renderWiktionaryResults(htmlContent, word) {
         e.preventDefault();
         const newWord = link.textContent.trim();
         if (newWord) {
-          document.getElementById('word').value = newWord;
-          lookupWiktionary(newWord);
+          const normalized = normalizeInput(newWord);
+          document.getElementById('word').value = normalized;
+          lookupWiktionary(normalized);
         }
       });
     }
   });
 }
 
-// Render Tamil VU results
-// Tamil VU Glossary Renderer v7.2 (Smart cell detection)
-function renderTamilVUResults(html, word) {
+// Render Tamil VU glossary rows (parsed in service worker)
+function renderTamilVUGlossary(glossaryEntries, searchWord) {
   const resultsEl = document.getElementById('results');
   resultsEl.style.display = 'block';
 
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  const rows = doc.querySelectorAll('tr');
-
-  let output = `
+  let resultsHtml = `
     <div class="result-header">
-      <strong>${word}</strong> — Tamil VU Glossary
+      <strong>${escapeHtml(searchWord)}</strong> — Tamil VU Glossary
     </div>
     <ol style="padding-left:18px; margin:6px 0 0 0; line-height:1.4;">
   `;
 
-  let found = 0;
-
-  rows.forEach(row => {
-    const tds = row.querySelectorAll('td');
-    if (tds.length < 3) return;
-
-    const cellTexts = Array.from(tds).map(td => 
-      td.textContent.trim().replace(/\s+/g, ' ')
-    );
-
-    // === Term: prefer Tamil text (like v7.3), fallback to old column logic ===
-    let term = '';
-    const hasTamil = cellTexts.some(t => /[\u0B80-\u0BFF]/.test(t));
-    
-    if (hasTamil) {
-      // Find the cell with Tamil
-      term = cellTexts.find(t => /[\u0B80-\u0BFF]/.test(t)) || '';
-    } else {
-      // Fallback to old logic (column 3 or 4)
-      term = cellTexts[3] || cellTexts[4] || cellTexts[2] || '';
-    }
-
-    // === Subject: use column 2 (exactly like your old working code) ===
-    let subject = cellTexts[2] || cellTexts[1] || '';
-    // Clean volume number if present
-    subject = subject.replace(/Volume\s*-\s*\d+/i, '').trim() || subject;
-
-    // Final cleanup
-    term = term.replace(/<[^>]*>/g, '').trim();
-
-    if (term && term.length > 2 && term !== subject) {
-      output += `
+  if (!glossaryEntries?.length) {
+    resultsHtml += `<li style="color:#c00;">No glossary entries found.</li>`;
+  } else {
+    for (const glossaryEntry of glossaryEntries) {
+      const { translationText, subjectArea } = glossaryEntry;
+      resultsHtml += `
         <li style="margin-bottom: 6px;">
-          ${term} 
-          <span style="color:#666; font-size:0.82em;">{ ${subject} }</span>
+          ${escapeHtml(translationText)}
+          <span style="color:#666; font-size:0.82em;">{ ${escapeHtml(subjectArea)} }</span>
         </li>
       `;
-      found++;
     }
-  });
-
-  if (found === 0) {
-    output += `<li style="color:#c00;">No results parsed. Please check console.</li>`;
   }
 
-  output += `</ol>`;
-  resultsEl.innerHTML = output;
+  resultsHtml += `</ol>`;
+  resultsEl.innerHTML = resultsHtml;
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 // Main lookup handler
-async function performLookup(source) {
-  const input = document.getElementById('word').value.trim();
-  if (!input) return;
+async function performLookup(lookupProvider) {
+  const wordInput = document.getElementById('word');
+  const searchWord = normalizeInput(wordInput.value);
+  if (!searchWord) return;
 
-  setLanguageDirection(input);
+  wordInput.value = searchWord;
+  setLanguageDirection(searchWord);
   document.getElementById('results').style.display = 'none';
 
-  if (source === 'wiki') {
-    await lookupWiktionary(input);
-  } else if (source === 'tvu') {
-    await lookupTamilVU(input);
+  if (lookupProvider === 'wiki') {
+    await lookupWiktionary(searchWord);
+  } else if (lookupProvider === 'tvu') {
+    await lookupTamilVUGlossary(searchWord);
   }
 }
 
@@ -229,27 +239,19 @@ function initializePopup() {
   wikiBtn.addEventListener('click', () => performLookup('wiki'));
   tvuBtn.addEventListener('click', () => performLookup('tvu'));
 
-  // Auto-lookup selected text (MV3 compliant using async/await)
-  chrome.tabs.query({ active: true, currentWindow: true }).then(async ([tab]) => {
-    if (!tab?.id) return;
-    
-    try {
-      const [result] = await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: () => window.getSelection().toString()
-      });
-      
-      const selectedText = result?.result?.trim();
-      if (selectedText) {
-        wordInput.value = selectedText;
-        setLanguageDirection(selectedText);
-        // Auto-trigger Wiktionary
+  // Auto-lookup selected text via content script (works on all_urls pages)
+  sendMessageAsync({ action: 'getSelectedWordFromPage' })
+    .then((selectionResponse) => {
+      const selectedWord = normalizeInput(selectionResponse?.selectedWord || '');
+      if (selectedWord) {
+        wordInput.value = selectedWord;
+        setLanguageDirection(selectedWord);
         performLookup('wiki');
       }
-    } catch (err) {
-      console.log('Could not get selected text:', err);
-    }
-  });
+    })
+    .catch((selectionError) =>
+      console.log('Could not get selected word:', selectionError)
+    );
 
   // Show helpful tip
   console.log('%c[Sorkalam] Modern MV3 version initialized', 'color:#0a66c2');

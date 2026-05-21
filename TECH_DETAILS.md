@@ -1,4 +1,8 @@
-# Sorkalam (சொற்களம்) — Technical Details
+# Sorkalam (சொற்களம்) — Technical Details (Legacy v5.x)
+
+> **This document describes the original extension (Manifest V2, jQuery, Glosbe + multi-source lookups).**  
+> For the current **v6.0 Manifest V3** implementation, see **[TECH_DETAILS_V6.md](TECH_DETAILS_V6.md)**.  
+> User-facing overview: **[README.md](README.md)**.
 
 Sorkalam is a lightweight Chrome extension (originally Manifest V2) for quick Tamil ↔ English word/phrase lookups across multiple dictionary and glossary sources. It was designed for Tamil speakers, students, and technical translators.
 
@@ -84,4 +88,14 @@ else                                   → language = "mixed"
 - Content Security Policy was relaxed to allow calls to the four external dictionary domains.
 - Pronunciation audio only implemented for English via Google’s static dictionary sound files.
 
-This document serves as an archival reference for the lookup strategies and data parsing techniques used in the extension.
+This document serves as an archival reference for the lookup strategies and data parsing techniques used in the **legacy** extension.
+
+---
+
+## See also
+
+| Document | Contents |
+|----------|----------|
+| [README.md](README.md) | Features, Brave install, usage |
+| [TECH_DETAILS_V6.md](TECH_DETAILS_V6.md) | v6.0 MV3 architecture, Wiktionary + Tamil VU, selection capture |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |

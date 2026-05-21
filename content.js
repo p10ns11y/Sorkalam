@@ -1,7 +1,24 @@
 // Sorkalam - Content Script (Manifest V3)
-// Sends currently selected text when popup requests it
+// Captures page text selection for the popup (selection is often cleared when popup opens)
 
-// This runs in the context of web pages
-// Currently minimal — selection is captured directly in popup.js using chrome.scripting.executeScript
+let lastCapturedSelection = '';
 
-console.log('[Sorkalam] Content script loaded (MV3)');
+function rememberPageSelection() {
+  const liveSelection = window.getSelection().toString().trim();
+  if (liveSelection) lastCapturedSelection = liveSelection;
+}
+
+function getSelectedWordFromPage() {
+  const liveSelection = window.getSelection().toString().trim();
+  return liveSelection || lastCapturedSelection;
+}
+
+document.addEventListener('mouseup', rememberPageSelection);
+document.addEventListener('keyup', rememberPageSelection);
+document.addEventListener('selectionchange', rememberPageSelection);
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.action === 'getSelectedWord') {
+    sendResponse({ selectedWord: getSelectedWordFromPage() });
+  }
+});

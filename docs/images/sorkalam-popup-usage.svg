@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="340" viewBox="0 0 400 340" role="img" aria-label="Sorkalam extension popup with lookup buttons">
+  <rect width="400" height="340" rx="12" fill="#f8f9fa" stroke="#dadce0"/>
+  <rect x="12" y="12" width="376" height="48" rx="8" fill="#fff"/>
+  <rect x="20" y="20" width="64" height="32" rx="4" fill="#0a66c2" opacity="0.2"/>
+  <text x="28" y="42" font-family="system-ui,sans-serif" font-size="14" font-weight="700" fill="#0a66c2">šÊ±Í•³®Í</text>
+  <text x="92" y="32" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#1a1a1a">šÊ±Í•³®Í</text>
+  <text x="92" y="50" font-family="system-ui,sans-serif" font-size="10" fill="#666">Tamil ” English Dictionary</text>
+  <rect x="12" y="72" width="296" height="40" rx="8" fill="#fff" stroke="#0a66c2" stroke-width="2"/>
+  <text x="24" y="98" font-family="system-ui,sans-serif" font-size="15" fill="#1a1a1a">¤®¿´Í</text>
+  <rect x="12" y="124" width="188" height="36" rx="8" fill="#0a66c2"/>
+  <text x="52" y="147" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#fff">Wiktionary</text>
+  <rect x="208" y="124" width="180" height="36" rx="8" fill="#e30613"/>
+  <text x="232" y="147" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#fff">Tamil VU Glossary</text>
+  <rect x="12" y="176" width="376" height="120" rx="8" fill="#fff" stroke="#eee"/>
+  <text x="24" y="200" font-family="system-ui,sans-serif" font-size="11" fill="#0a66c2" font-weight="600">TA ’ EN</text>
+  <text x="24" y="222" font-family="system-ui,sans-serif" font-size="14" font-weight="600" fill="#1a1a1a">¤®¿´Í</text>
+  <text x="24" y="244" font-family="system-ui,sans-serif" font-size="12" fill="#444">noun  Tamil language</text>
+  <text x="24" y="264" font-family="system-ui,sans-serif" font-size="12" fill="#444">" Dravidian language spoken in...</text>
+  <text x="12" y="312" font-family="system-ui,sans-serif" font-size="11" fill="#666" text-anchor="middle">b Select text on a page ’ open popup ’ auto-lookup</text>
+  <rect x="308" y="8" width="80" height="56" rx="6" fill="#2a2a2a" opacity="0.08"/>
+  <text x="318" y="28" font-family="system-ui,sans-serif" font-size="10" fill="#666">Brave</text>
+  <text x="318" y="44" font-family="system-ui,sans-serif" font-size="10" fill="#666">toolbar</text>
+  <circle cx="348" cy="52" r="14" fill="#0a66c2"/>
+  <text x="342" y="57" font-family="system-ui,sans-serif" font-size="12" fill="#fff">š</text>
+</svg>
