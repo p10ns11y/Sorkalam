@@ -111,6 +111,21 @@ async function lookupTamilVUGlossary(searchWord) {
   try {
     const glossarySearchColumn =
       currentLanguage === 'tamil' ? 'Tamil' : 'English';
+    const cacheKey = GlossaryCache.buildTamilVuCacheKey(
+      searchWord,
+      glossarySearchColumn
+    );
+
+    try {
+      const cachedRecord = await GlossaryCache.getTamilVu(cacheKey);
+      if (cachedRecord?.glossaryEntries?.length) {
+        renderTamilVUGlossary(cachedRecord.glossaryEntries, searchWord, true);
+        statusEl.textContent = '';
+        return;
+      }
+    } catch (cacheReadError) {
+      console.warn('[Sorkalam] Tamil VU parsed cache read:', cacheReadError);
+    }
 
     const glossaryResponse = await sendMessageAsync(
       {
@@ -126,7 +141,43 @@ async function lookupTamilVUGlossary(searchWord) {
       throw lookupError;
     }
 
-    renderTamilVUGlossary(glossaryResponse.glossaryEntries, searchWord);
+    let glossaryEntries = glossaryResponse.glossaryEntries;
+    let glossaryTable = null;
+    if (!glossaryEntries?.length) {
+      if (!glossaryResponse.glossaryPageHtml) {
+        throw new Error(
+          'No glossary HTML received. Reload the extension at brave://extensions.'
+        );
+      }
+      glossaryTable = TamilVUGlossaryParse.parseTamilVUGlossaryHtml(
+        glossaryResponse.glossaryPageHtml
+      );
+      glossaryEntries = TamilVUGlossaryParse.glossaryTableToEntries(
+        glossaryTable,
+        glossarySearchColumn
+      );
+    }
+    if (!glossaryEntries.length) {
+      throw new Error('No glossary entries found in results table.');
+    }
+
+    const responseCacheKey = glossaryResponse.cacheKey || cacheKey;
+    try {
+      await GlossaryCache.setTamilVu({
+        cacheKey: responseCacheKey,
+        glossaryPageHtml: glossaryResponse.glossaryPageHtml,
+        glossaryTable,
+        glossaryEntries,
+      });
+    } catch (cacheWriteError) {
+      console.warn('[Sorkalam] Tamil VU parsed cache write:', cacheWriteError);
+    }
+
+    renderTamilVUGlossary(
+      glossaryEntries,
+      searchWord,
+      Boolean(glossaryResponse.fromCache)
+    );
     statusEl.textContent = '';
   } catch (lookupError) {
     statusEl.textContent = lookupError.message;
@@ -165,13 +216,19 @@ function renderWiktionaryResults(htmlContent, word) {
 }
 
 // Render Tamil VU glossary rows (parsed in service worker)
-function renderTamilVUGlossary(glossaryEntries, searchWord) {
+function renderTamilVUGlossary(glossaryEntries, searchWord, fromCache = false) {
   const resultsEl = document.getElementById('results');
   resultsEl.style.display = 'block';
+  const glossarySearchColumn =
+    currentLanguage === 'tamil' ? 'Tamil' : 'English';
+
+  const cacheLabel = fromCache
+    ? ' <span style="color:#888; font-weight:normal; font-size:0.85em;">(cached)</span>'
+    : '';
 
   let resultsHtml = `
     <div class="result-header">
-      <strong>${escapeHtml(searchWord)}</strong> — Tamil VU Glossary
+      <strong>${escapeHtml(searchWord)}</strong> — Tamil VU Glossary${cacheLabel}
     </div>
     <ol style="padding-left:18px; margin:6px 0 0 0; line-height:1.4;">
   `;
@@ -180,11 +237,14 @@ function renderTamilVUGlossary(glossaryEntries, searchWord) {
     resultsHtml += `<li style="color:#c00;">No glossary entries found.</li>`;
   } else {
     for (const glossaryEntry of glossaryEntries) {
-      const { translationText, subjectArea } = glossaryEntry;
+      const translationText = resolveTamilVuTranslationText(
+        glossaryEntry,
+        glossarySearchColumn
+      );
       resultsHtml += `
         <li style="margin-bottom: 6px;">
           ${escapeHtml(translationText)}
-          <span style="color:#666; font-size:0.82em;">{ ${escapeHtml(subjectArea)} }</span>
+          <span style="color:#666; font-size:0.82em;">{ ${escapeHtml(glossaryEntry.subjectArea || '')} }</span>
         </li>
       `;
     }
@@ -192,6 +252,14 @@ function renderTamilVUGlossary(glossaryEntries, searchWord) {
 
   resultsHtml += `</ol>`;
   resultsEl.innerHTML = resultsHtml;
+}
+
+/** Supports v4 entries; falls back if older cache rows stored english/tamil. */
+function resolveTamilVuTranslationText(glossaryEntry, glossarySearchColumn) {
+  if (glossaryEntry.translationText) return glossaryEntry.translationText;
+  const { english = '', tamil = '' } = glossaryEntry;
+  if (glossarySearchColumn === 'Tamil') return english || tamil;
+  return tamil || english;
 }
 
 function escapeHtml(text) {

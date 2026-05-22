@@ -88,26 +88,40 @@ https://www.tamilvu.org/slet/technical_glossary/tech_engser.jsp
 ```
 
 - **Availability**: The glossary endpoint is sometimes **temporarily down or very slow** (not an extension bug). When it recovers, the same URL works in Brave and in Sorkalam.
-- **Fetch path**: Popup sends `{ action: 'fetchTamilVUGlossary', searchWord, glossarySearchColumn }`. The service worker fetches **HTTPS only**, then a **hidden-tab fallback** if needed. Returns `{ ok, glossaryEntries }` (parsed in the SW).
+- **Fetch path**: Popup sends `{ action: 'fetchTamilVUGlossary', searchWord, glossarySearchColumn }`. The service worker fetches **HTTPS only**, then a **hidden-tab fallback** if needed. Returns `{ ok, glossaryPageHtml, fromCache?, cacheKey }`. The popup parses HTML with `DOMParser` in [`tamilvu-glossary-parse.js`](tamilvu-glossary-parse.js) → `{ columns, rows }` JSON, then maps rows to display entries.
+- **Cache** ([`glossary-cache.js`](glossary-cache.js)): **IndexedDB** (`sorkalam-glossary-cache`), shared by popup and service worker. Key: `tamilvu:{English|Tamil}:{word}`. Stores HTML (SW) and parsed `glossaryEntries` (popup). TTL **7 days**, max **250** entries; pruned on write and extension install/update.
 
 ```mermaid
 sequenceDiagram
-  participant Popup as popup.js
+  participant Popup
+  participant IDB as IndexedDB
   participant SW as event.js
   participant TVU as tamilvu.org
 
-  Popup->>SW: sendMessage({ action: 'fetchTamilVUGlossary', searchWord, glossarySearchColumn })
-  SW->>TVU: fetch(glossarySearchUrl)
-  TVU-->>SW: HTML
-  SW-->>Popup: { ok: true, glossaryEntries }
-  Popup->>Popup: renderTamilVUGlossary(glossaryEntries)
+  Popup->>IDB: getTamilVu (parsed entries?)
+  alt entries hit
+    IDB-->>Popup: glossaryEntries
+    Popup->>Popup: render (cached)
+  else miss
+    Popup->>SW: fetchTamilVUGlossary
+    SW->>IDB: getTamilVu (HTML?)
+    alt HTML hit
+      IDB-->>SW: glossaryPageHtml
+    else
+      SW->>TVU: fetch
+      SW->>IDB: setTamilVu (HTML)
+    end
+    SW-->>Popup: glossaryPageHtml
+    Popup->>Popup: parse → entries
+    Popup->>IDB: setTamilVu (HTML + table + entries)
+  end
 ```
 
-- **Processing** (`fetchTamilVUGlossary` in `event.js` parses HTML; popup `renderTamilVUGlossary` renders):
-  - Regex table parse in the service worker (no `DOMParser` in MV3 service workers)
-  - For each table row: detect Tamil in cells; prefer Tamil cell as **term**, column 2 as **subject**
-  - Fallback to legacy column indices (3, 4, 2) when no Tamil script in row
-  - Renders ordered list with `{ subject }` suffix
+- **Processing** (`tamilvu-glossary-parse.js` in the popup; `event.js` only fetches HTML):
+  - `DOMParser` → results table with header row (`English`, `Subject`, …) → **`{ columns, rows }`**
+  - Each `row` is a plain object, e.g. `{ slNo, english, tamil, subject, volume }`
+  - `glossaryTableToEntries()` sets **translationText** to the opposite language (English search → Tamil; Tamil search → English) plus **subjectArea**
+  - Popup renders one term per line with `{ subject }` suffix
 - **Errors**: Network or HTTP failures return `{ ok: false, error }`; the popup shows a message in `#status`.
 
 ---
@@ -149,6 +163,8 @@ Selection and content scripts do not run on `brave://`, `chrome://`, extension s
 
 ```
 popup.js       detectLanguage, lookupWiktionary, lookupTamilVU, performLookup, initializePopup
+glossary-cache.js        IndexedDB Tamil VU cache (HTML + parsed entries)
+tamilvu-glossary-parse.js  DOMParser table → { columns, rows }; glossaryTableToEntries
 content.js     lastCapturedSelection cache, getSelectedWord message handler
 event.js       getSelectedWordFromPage relay, Tamil VU glossary fetch
 manifest.json  MV3 config

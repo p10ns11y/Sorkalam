@@ -129,21 +129,34 @@ The same flow applies with these URLs:
 
 ![Sorkalam popup — Tamil VU Glossary results for “texture”](images/sorkalam-popup-usage.png)
 
-### Tamil VU lookup (background fetch)
+### Tamil VU lookup (fetch + IndexedDB cache)
 
-Tamil VU requests go through the service worker so the popup avoids CORS limits on `tamilvu.org`:
+Tamil VU requests go through the service worker (CORS bypass). Results are cached in **IndexedDB** ([`glossary-cache.js`](glossary-cache.js)) — parsed entries in the popup, HTML in the service worker:
 
 ```mermaid
 sequenceDiagram
-  participant Popup as popup.js
+  participant Popup
+  participant IDB as IndexedDB
   participant SW as event.js
   participant TVU as tamilvu.org
 
-  Popup->>SW: sendMessage({ action: 'fetchTamilVUGlossary', searchWord, glossarySearchColumn })
-  SW->>TVU: fetch(glossarySearchUrl)
-  TVU-->>SW: HTML
-  SW-->>Popup: { ok: true, glossaryEntries }
-  Popup->>Popup: renderTamilVUGlossary(glossaryEntries)
+  Popup->>IDB: getTamilVu (parsed entries?)
+  alt entries hit
+    IDB-->>Popup: glossaryEntries
+    Popup->>Popup: render (cached)
+  else miss
+    Popup->>SW: fetchTamilVUGlossary
+    SW->>IDB: getTamilVu (HTML?)
+    alt HTML hit
+      IDB-->>SW: glossaryPageHtml
+    else
+      SW->>TVU: fetch
+      SW->>IDB: setTamilVu (HTML)
+    end
+    SW-->>Popup: glossaryPageHtml
+    Popup->>Popup: parse → entries
+    Popup->>IDB: setTamilVu (HTML + table + entries)
+  end
 ```
 
 More detail: [TECH_DETAILS_V6.md — Tamil VU Glossary](TECH_DETAILS_V6.md#lookup-tamil-vu-glossary).
@@ -170,6 +183,8 @@ sorkalam-extension/
 ├── manifest.json          # MV3 configuration
 ├── popup.html             # Main popup UI
 ├── popup.js               # Core lookup logic
+├── glossary-cache.js      # Tamil VU IndexedDB cache (7-day TTL)
+├── tamilvu-glossary-parse.js  # Tamil VU HTML table → JSON (DOMParser)
 ├── event.js               # Service worker (selection relay)
 ├── content.js             # Page selection capture
 ├── css/
