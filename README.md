@@ -6,6 +6,36 @@
   <img src="images/sorkalam-logo-retro.png" alt="சொற்களம் — Sorkalam" width="128" height="128">
 </p>
 
+## The Time Traveler's Story
+
+> **2014 → 2026**  
+> A time traveler from the future meets the original Sorkalam.
+
+In **2014**, a developer created *Sorkalam* with a simple dream:  
+**“Let Tamil learners tap any word and instantly understand it — without ever leaving the browser tab.”**
+
+No new tabs. No distraction. Just pure, focused learning.
+
+Ten years later, a time traveler arrived from **2026**. They opened the old code, smiled, and said:
+
+> “The heart is still beating.  
+> Only the clothes have changed.”
+
+They adapted everything — Manifest V3, clean vanilla JavaScript, a clearer UI, faster performance — but kept the original promise intact:
+
+- Instant glossary/thesaurus lookup  
+- No context switching  
+- Deep respect for the learner’s focus
+
+Just like how **Grok** on X lets you tap **any post** and dive deeper without leaving your timeline, *Sorkalam* does the same for Tamil technical terms.
+
+The time traveler left behind only one message before disappearing:
+
+> “Some tools are not just software.  
+> They are quiet bridges between generations of curious minds.”
+
+---
+
 ### What Sorkalam offers
 
 **Focus helpers (glossaries)** — results stay in the popup:
@@ -39,7 +69,9 @@ Type or highlight a word, then tap a chip — or press **Enter** for Wiktionary.
 
 Click words inside Wiktionary results for a quick follow-up lookup.
 
-![Sorkalam popup — Tamil VU glossary results for “களம்”](images/sorkalam-popup-usage.png)
+<p align="center">
+  <img src="images/sorkalam-popup-usage.png" alt="Sorkalam popup — Tamil VU glossary results for களம்" width="240">
+</p>
 
 ---
 
