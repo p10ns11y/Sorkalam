@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Sorkalam",
   "version": "6.0.0",
-  "description": "சொற்களம்: தமிழ் ↔ ஆங்கிலம் (Wiktionary, Tamil VU, Grok, Grokipedia) - Modern Manifest V3",
+  "description": "சொற்களம்: Tamil ↔ English — Wiktionary & Tamil VU glossaries in-popup; Grok & Grokipedia for deeper research",
   
   "action": {
     "default_popup": "popup.html",

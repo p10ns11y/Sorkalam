@@ -9,9 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [6.0.0] - 2026-05-21
 
-### 🚀 Major Modernization
+### 🚀 Major Adaptation
 
-This release completely modernizes Sorkalam for 2026 standards while keeping the original spirit and functionality.
+This release adapts Sorkalam for 2026 standards while keeping the original spirit and functionality.
 
 #### Changed
 - **Manifest V3** — Full compliance with current Chrome extension standards

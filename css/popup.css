@@ -117,24 +117,17 @@ body.app {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--s1);
   width: 100%;
   padding: var(--s2) var(--s2) var(--s2);
 }
 
-.app-mark {
+.app-logo {
   display: block;
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
-}
-
-.app-wordmark {
-  font-size: 1.05rem;
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--brand);
-  letter-spacing: 0.01em;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .search-field {

@@ -1,10 +1,10 @@
 # Sorkalam (சொற்களம்) — Technical Details (v6.0)
 
 > **This document describes the current Manifest V3 extension in this repository.**  
-> For the original v5.x design (Glosbe, jQuery, MV2), see **[TECH_DETAILS.md](TECH_DETAILS.md)**.  
-> User-facing overview: **[README.md](README.md)**.
+> User guide (install, usage, troubleshooting): **[README.md](README.md)**.  
+> For the original v5.x design (Glosbe, jQuery, MV2), see **[TECH_DETAILS.md](TECH_DETAILS.md)**.
 
-Sorkalam v6.0 is a Chromium extension (Brave, Chrome, Edge) for Tamil ↔ English lookups via **Wiktionary** and the **Tamil Virtual University technical glossary**. It uses vanilla JavaScript, a service worker, and a content script—no jQuery in the active lookup path.
+Sorkalam v6.0 is a Chromium extension (Brave, Chrome, Edge) for Tamil ↔ English lookups: **focus helpers** (Wiktionary, Tamil Virtual University glossary in the popup) and **research helpers** (Grok, Grokipedia in a new tab). Vanilla JavaScript, service worker, content script—no jQuery in the active lookup path.
 
 ---
 
@@ -29,14 +29,19 @@ Sorkalam v6.0 is a Chromium extension (Brave, Chrome, Edge) for Tamil ↔ Englis
 
 ## Lookup providers (popup chips)
 
-| Chip | In-popup | URL / API |
-|------|----------|-----------|
-| **W** | Yes | `{toLang}.wiktionary.org` MediaWiki `action=parse` |
-| **TVU** | Yes | Tamil VU via service worker + IndexedDB cache |
-| **G** | No (new tab) | `https://grok.com/?q={encodeURIComponent(query)}` |
-| **GP** | No (new tab) | `https://grokipedia.com/search?q={encodeURIComponent(query)}` |
+**Focus helpers (glossaries)** — in-popup:
 
-**G** and **GP** use `chrome.tabs.create` from the popup (`tabs` permission). No `host_permissions` for grok.com / grokipedia.com are required for opening external URLs.
+| Chip | Source | URL / API |
+|------|--------|-----------|
+| **W** | Wiktionary | `{toLang}.wiktionary.org` MediaWiki `action=parse` |
+| **TVU** | Tamil Virtual University | Service worker fetch + IndexedDB cache |
+
+**Research helpers** — new tab (`chrome.tabs.create`, `tabs` permission; no extra `host_permissions` for grok.com / grokipedia.com):
+
+| Chip | Source | URL | Role |
+|------|--------|-----|------|
+| **G** | Grok | `https://grok.com/?q={encodeURIComponent(query)}` | External conversation |
+| **GP** | Grokipedia | `https://grokipedia.com/search?q={encodeURIComponent(query)}` | Popular-articles search |
 
 Future: API keys in `chrome.storage` for in-popup Grok / Grokipedia results (not implemented).
 
