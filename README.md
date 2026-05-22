@@ -24,7 +24,7 @@
 
 Type or highlight a word, then tap a chip — or press **Enter** for Wiktionary.
 
-*v6.0 dev build — load unpacked in [Brave](https://brave.com/) or Chrome. Not on the Web Store yet. Still on the old MV2 listing? See [TECH_DETAILS.md — MV2 / v5.5](TECH_DETAILS.md#still-using-the-manifest-v2-v55-build).*
+*Not on the Chrome Web Store yet — install from GitHub (below). Still on the old MV2 listing? See [TECH_DETAILS.md — MV2 / v5.5](TECH_DETAILS.md#still-using-the-manifest-v2-v55-build).*
 
 ---
 
@@ -34,7 +34,7 @@ Type or highlight a word, then tap a chip — or press **Enter** for Wiktionary.
 |------|--------|
 | 1 | Click the Sorkalam icon in the toolbar |
 | 2 | Type Tamil or English; press **Enter** → Wiktionary |
-| 3 | Or tap a provider chip (table below) |
+| 3 | Or tap a provider chip (**W**, **TVU**, **G**, **GP** — see above) |
 | 4 | **Pro tip:** select text on a page, then open the popup — it auto-fills and runs Wiktionary |
 
 Click words inside Wiktionary results for a quick follow-up lookup.
@@ -43,21 +43,33 @@ Click words inside Wiktionary results for a quick follow-up lookup.
 
 ---
 
-## Install (Developer Mode)
+## Download
 
-1. Clone or download this repo — you need the folder that contains `manifest.json`.
-   ```bash
-   git clone https://github.com/p10ns11y/sorkalam-extension.git
-   cd sorkalam-extension
-   ```
+You do not need Git. Download a zip, unzip it, then install in the browser (next section).
+
+| What you want | Where to go | What to download |
+|---------------|-------------|------------------|
+| **Latest stable release** (recommended) | [github.com/p10ns11y/sorkalam-extension/releases](https://github.com/p10ns11y/sorkalam-extension/releases) | Open the newest release (e.g. **v6.1**) → under **Assets**, choose **Source code (zip)** |
+| **A specific older version** | [github.com/p10ns11y/sorkalam-extension/tags](https://github.com/p10ns11y/sorkalam-extension/tags) | Click the tag you want (e.g. **v6**, **v5-legacy**) → **Download zip** |
+| **Main branch (latest)** | [github.com/p10ns11y/sorkalam-extension](https://github.com/p10ns11y/sorkalam-extension) | Green **Code** button → **Download ZIP** |
+
+After unzipping, open the folder named `sorkalam-extension-…` (or similar). Inside you should see `manifest.json` — that folder is what you load in the browser.
+
+**Developers:** you can also `git clone https://github.com/p10ns11y/sorkalam-extension.git`.
+
+---
+
+## Install in Brave / Chrome (Developer Mode)
+
+1. Unzip the download (or use your clone) so you have a folder containing **`manifest.json`** at its top level.
 2. Open **`brave://extensions`** (or your browser’s extensions page — see table below).
 3. Turn on **Developer mode** (top-right).
 
    ![Brave extensions — Developer mode on](images/brave-extensions-developer-mode.png)
 
-4. Click **Load unpacked** and select the project root (not a subfolder like `css/`).
+4. Click **Load unpacked** and select that folder (not a subfolder like `css/`).
 5. Pin **Sorkalam** from the extensions menu (puzzle icon).
-6. After code edits, click **Reload** on the extension card at `brave://extensions`.
+6. When you download a newer zip later, repeat from step 4 or click **Reload** on the extension card.
 
 | Browser | Extensions URL |
 |---------|------------------|
@@ -76,7 +88,8 @@ Click words inside Wiktionary results for a quick follow-up lookup.
 | Extension fails to load | Select the folder that contains `manifest.json`; read the error on the card |
 | Selected text not detected | Reload extension, refresh the page, select text **before** opening the popup |
 | Lookup fails on some sites | `brave://`, Web Store, and some PDFs block scripts — try a normal web page |
-| Changes not visible | **Reload** the extension after saving files |
+| Changes not visible | **Reload** the extension after saving files, or load the new unzip folder again |
+| Downloaded zip won’t load | Unzip first; pick the folder that contains `manifest.json`, not the outer Downloads wrapper |
 
 Tamil VU cache and parsing: [TECH_DETAILS_V6.md — Tamil VU Glossary](TECH_DETAILS_V6.md#lookup-tamil-vu-glossary).
 
