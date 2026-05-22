@@ -152,10 +152,7 @@ async function lookupTamilVUGlossary(searchWord) {
       glossaryTable = TamilVUGlossaryParse.parseTamilVUGlossaryHtml(
         glossaryResponse.glossaryPageHtml
       );
-      glossaryEntries = TamilVUGlossaryParse.glossaryTableToEntries(
-        glossaryTable,
-        glossarySearchColumn
-      );
+      glossaryEntries = TamilVUGlossaryParse.glossaryTableToEntries(glossaryTable);
     }
     if (!glossaryEntries.length) {
       throw new Error('No glossary entries found in results table.');
@@ -235,11 +232,10 @@ function renderTamilVUGlossary(glossaryEntries, searchWord, fromCache = false) {
     resultsHtml += `<li style="color:#c00;">No glossary entries found.</li>`;
   } else {
     for (const glossaryEntry of glossaryEntries) {
-      const { translationText, subjectArea } = glossaryEntry;
       resultsHtml += `
         <li style="margin-bottom: 6px;">
-          ${escapeHtml(translationText)}
-          <span style="color:#666; font-size:0.82em;">{ ${escapeHtml(subjectArea)} }</span>
+          ${formatTamilVuBilingualLine(glossaryEntry)}
+          <span style="color:#666; font-size:0.82em;">{ ${escapeHtml(glossaryEntry.subjectArea || '')} }</span>
         </li>
       `;
     }
@@ -247,6 +243,30 @@ function renderTamilVUGlossary(glossaryEntries, searchWord, fromCache = false) {
 
   resultsHtml += `</ol>`;
   resultsEl.innerHTML = resultsHtml;
+}
+
+function formatTamilVuBilingualLine(glossaryEntry) {
+  let { english = '', tamil = '', translationText = '' } = glossaryEntry;
+  if (!english && !tamil && translationText) {
+    if (/[\u0B80-\u0BFF]/.test(translationText)) tamil = translationText;
+    else english = translationText;
+  }
+
+  const parts = [];
+  if (english) {
+    parts.push(
+      `<span class="glossary-en" lang="en">${escapeHtml(english)}</span>`
+    );
+  }
+  if (tamil) {
+    parts.push(
+      `<span class="glossary-ta" lang="ta">${escapeHtml(tamil)}</span>`
+    );
+  }
+  if (!parts.length) return escapeHtml(translationText || '—');
+  return parts.join(
+    ' <span style="color:#aaa; font-weight:normal;" aria-hidden="true">·</span> '
+  );
 }
 
 function escapeHtml(text) {

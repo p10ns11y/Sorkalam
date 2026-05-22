@@ -120,8 +120,8 @@ sequenceDiagram
 - **Processing** (`tamilvu-glossary-parse.js` in the popup; `event.js` only fetches HTML):
   - `DOMParser` → results table with header row (`English`, `Subject`, …) → **`{ columns, rows }`**
   - Each `row` is a plain object, e.g. `{ slNo, english, tamil, subject, volume }`
-  - `glossaryTableToEntries()` picks **translationText** (Tamil when searching English) and **subjectArea** for the list UI; keeps full `row` on each entry for traversal
-  - Renders ordered list with `{ subject }` suffix
+  - `glossaryTableToEntries()` maps each row to **english**, **tamil**, and **subjectArea**; keeps full `row` for traversal
+  - Popup renders both languages per line: `English · Tamil { subject }`
 - **Errors**: Network or HTTP failures return `{ ok: false, error }`; the popup shows a message in `#status`.
 
 ---

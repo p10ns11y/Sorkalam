@@ -6,7 +6,8 @@
  * @property {Record<string, string>[]} rows - One object per data row
  *
  * @typedef {Object} TamilVUGlossaryEntry
- * @property {string} translationText - Term to show (usually Tamil when searching English)
+ * @property {string} english - English term from the table row
+ * @property {string} tamil - Tamil term from the table row
  * @property {string} subjectArea
  * @property {Record<string, string>} row - Full row for traversal / future UI
  */
@@ -148,49 +149,56 @@ function pickField(row, ...keys) {
   return '';
 }
 
+function isMetadataCell(value, subjectArea) {
+  if (!value) return true;
+  if (value === subjectArea) return true;
+  if (/^\d+$/.test(value)) return true;
+  if (/^Volume\s*-/i.test(value)) return true;
+  return false;
+}
+
+function extractEnglishTamilFromRow(row) {
+  let english = pickField(row, 'english', 'col3');
+  let tamil = pickField(row, 'tamil', 'col4');
+  const subjectArea = pickField(row, 'subject', 'col2');
+
+  if (!english || hasTamilScript(english)) {
+    english =
+      Object.values(row).find(
+        (value) =>
+          !hasTamilScript(value) && !isMetadataCell(value, subjectArea)
+      ) || '';
+  }
+  if (!tamil || !hasTamilScript(tamil)) {
+    tamil = Object.values(row).find((value) => hasTamilScript(value)) || '';
+  }
+
+  return { english: english.trim(), tamil: tamil.trim() };
+}
+
 /**
- * Map structured rows to popup display entries.
+ * Map structured rows to popup display entries (both languages per row).
  * @param {TamilVUGlossaryTable} glossaryTable
- * @param {'Tamil'|'English'} glossarySearchColumn
  * @returns {TamilVUGlossaryEntry[]}
  */
-function glossaryTableToEntries(glossaryTable, glossarySearchColumn) {
+function glossaryTableToEntries(glossaryTable) {
   const entries = [];
 
   for (const row of glossaryTable.rows) {
-    const english = pickField(row, 'english', 'col3');
-    const tamil = pickField(row, 'tamil', 'col4');
-    let subjectArea = pickField(row, 'subject', 'col2').replace(/Volume\s*-\s*\d+/i, '').trim();
+    const subjectArea = pickField(row, 'subject', 'col2')
+      .replace(/Volume\s*-\s*\d+/i, '')
+      .trim();
+    const { english, tamil } = extractEnglishTamilFromRow(row);
 
-    let translationText = '';
-    if (glossarySearchColumn === 'Tamil') {
-      translationText = tamil || english;
-    } else if (hasTamilScript(tamil)) {
-      translationText = tamil;
-    } else if (hasTamilScript(english)) {
-      translationText = english;
-    } else {
-      translationText =
-        tamil ||
-        english ||
-        Object.values(row).find((value) => hasTamilScript(value)) ||
-        '';
-    }
-
-    if (
-      /^English\s*$/i.test(translationText) &&
-      /^Subject\s*$/i.test(subjectArea)
-    ) {
+    if (/^English\s*$/i.test(english) && /^Subject\s*$/i.test(subjectArea)) {
       continue;
     }
 
-    if (
-      translationText &&
-      translationText.length > 2 &&
-      translationText !== subjectArea
-    ) {
-      entries.push({ translationText, subjectArea, row });
-    }
+    const hasEnglish = english.length > 1 && english !== subjectArea;
+    const hasTamil = tamil.length > 1 && tamil !== subjectArea;
+    if (!hasEnglish && !hasTamil) continue;
+
+    entries.push({ english, tamil, subjectArea, row });
   }
 
   return entries;

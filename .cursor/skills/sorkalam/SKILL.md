@@ -30,7 +30,7 @@ Full architecture: [TECH_DETAILS_V6.md](../../../TECH_DETAILS_V6.md).
 | `getSelectedWord` | `event.js` → content script | `{ selectedWord }` |
 | `fetchTamilVUGlossary` | popup → `event.js` | `{ ok, glossaryPageHtml, fromCache?, cacheKey }` or error |
 
-Popup: check `GlossaryCache.getTamilVu` for `glossaryEntries` first; else parse HTML and `setTamilVu` with table + entries. SW caches HTML on network fetch. Flow diagram: [TECH_DETAILS_V6.md — Tamil VU Glossary](../../../TECH_DETAILS_V6.md#lookup-tamil-vu-glossary).
+Popup: check `GlossaryCache.getTamilVu` for `glossaryEntries` first; else parse HTML and `setTamilVu` with table + entries. Each entry has `english`, `tamil`, `subjectArea` (both shown in UI). SW caches HTML on network fetch.
 
 ## Rules for changes
 
