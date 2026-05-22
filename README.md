@@ -14,7 +14,8 @@
 ---
 ## Features
 
-- 🔍 **Wiktionary** lookup (English ↔ Tamil)
+- 🔍 **Wiktionary** lookup (English ↔ Tamil) in the popup
+- 🔗 **Grok** and **Grokipedia** open in a new tab with your search term (more detail on demand)
 - 📚 **Tamil Virtual University (Tamilvu.org)** technical glossary
 - 🧠 Smart language detection (Tamil ↔ English)
 - ⚡ Auto-lookup of selected text when opening the extension
@@ -123,7 +124,14 @@ The same flow applies with these URLs:
 
 1. Click the Sorkalam icon in the toolbar.
 2. Type a word (Tamil or English) and press **Enter** (defaults to Wiktionary).
-3. Or click **Wiktionary** / **Tamil VU Glossary**.
+3. Tap a provider chip: **W** (Wiktionary), **TVU** (Tamil VU glossary, in-popup), **G** (Grok), **GP** (Grokipedia, new tab).
+
+| Chip | Where results appear | URL pattern |
+|------|----------------------|-------------|
+| W | Popup | Wiktionary API |
+| TVU | Popup | Tamil VU (via service worker) |
+| G | New tab | `https://grok.com/?q={query}` |
+| GP | New tab | `https://grokipedia.com/search?q={query}` |
 4. Click any word in the results for a quick follow-up search.
 
 **Pro tip**: Highlight a word on any webpage → open the Sorkalam popup → it fills the input and runs a Wiktionary lookup automatically.

@@ -23,7 +23,22 @@ Sorkalam v6.0 is a Chromium extension (Brave, Chrome, Edge) for Tamil ↔ Englis
 2. User opens the popup → `popup.js` sends `{ action: 'getSelectedWordFromPage' }` to `event.js`.
 3. `event.js` messages the tab’s content script (`{ action: 'getSelectedWord' }`) or falls back to `chrome.scripting.executeScript`.
 4. Popup fills `#word`, runs `detectLanguage()`, and calls `performLookup('wiki')` if text is non-empty.
-5. User may switch source with **Wiktionary** or **Tamil VU Glossary** buttons, or press **Enter** (Wiktionary default).
+5. User may switch source with provider chips (**W**, **TVU**, **G**, **GP**), or press **Enter** (Wiktionary default).
+
+---
+
+## Lookup providers (popup chips)
+
+| Chip | In-popup | URL / API |
+|------|----------|-----------|
+| **W** | Yes | `{toLang}.wiktionary.org` MediaWiki `action=parse` |
+| **TVU** | Yes | Tamil VU via service worker + IndexedDB cache |
+| **G** | No (new tab) | `https://grok.com/?q={encodeURIComponent(query)}` |
+| **GP** | No (new tab) | `https://grokipedia.com/search?q={encodeURIComponent(query)}` |
+
+**G** and **GP** use `chrome.tabs.create` from the popup (`tabs` permission). No `host_permissions` for grok.com / grokipedia.com are required for opening external URLs.
+
+Future: API keys in `chrome.storage` for in-popup Grok / Grokipedia results (not implemented).
 
 ---
 
@@ -57,7 +72,7 @@ else → 'english'                              // fromLang=en, toLang=ta
 
 ## Lookup: Wiktionary
 
-- **Trigger**: Enter, Wiktionary button, auto on popup open with selection, in-result `#` link clicks
+- **Trigger**: Enter, **W** chip, auto on popup open with selection, in-result `#` link clicks
 - **API**: MediaWiki `action=parse` (single fetch per lookup)
 
 ```
@@ -162,7 +177,7 @@ Selection and content scripts do not run on `brave://`, `chrome://`, extension s
 ## File Map
 
 ```
-popup.js       detectLanguage, lookupWiktionary, lookupTamilVU, performLookup, initializePopup
+popup.js       detectLanguage, lookupWiktionary, lookupTamilVU, performLookup, openExternalLookup, initializePopup
 glossary-cache.js        IndexedDB Tamil VU cache (HTML + parsed entries)
 tamilvu-glossary-parse.js  DOMParser table → { columns, rows }; glossaryTableToEntries
 content.js     lastCapturedSelection cache, getSelectedWord message handler

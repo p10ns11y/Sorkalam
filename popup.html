@@ -22,19 +22,67 @@
           >
         </label>
 
-        <div class="action-row">
+        <div class="provider-row" role="group" aria-label="Lookup sources">
           <button
             type="button"
             id="wiki-btn"
-            class="btn btn-wiki"
-            aria-label="Look up on Wiktionary"
-          >Wiktionary</button>
+            class="provider-btn provider-btn--wiki"
+            title="Wiktionary — lookup in popup"
+            aria-label="Wiktionary — lookup in popup"
+          >W</button>
           <button
             type="button"
             id="tvu-btn"
-            class="btn btn-tvu"
-            aria-label="Look up on Tamil VU glossary"
-          >Tamil VU</button>
+            class="provider-btn provider-btn--tvu"
+            title="Tamil VU Glossary — lookup in popup"
+            aria-label="Tamil VU Glossary — lookup in popup"
+          >TVU</button>
+          <a
+            id="grok-btn"
+            class="provider-btn provider-btn--grok provider-btn--external"
+            href="https://grok.com/"
+            title="Grok — https://grok.com/"
+            aria-label="Grok — opens in new tab"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="provider-label">G</span>
+            <span class="provider-external-badge" aria-hidden="true">
+              <svg viewBox="0 0 12 12" focusable="false">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.35"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M7.25 1.75H10v2.75M10 1.75 5.5 6.25M4.25 4.25H2v6.25h6.25V8.25"
+                />
+              </svg>
+            </span>
+          </a>
+          <a
+            id="gp-btn"
+            class="provider-btn provider-btn--gp provider-btn--external"
+            href="https://grokipedia.com/search"
+            title="Grokipedia — https://grokipedia.com/search"
+            aria-label="Grokipedia — opens in new tab"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="provider-label">GP</span>
+            <span class="provider-external-badge" aria-hidden="true">
+              <svg viewBox="0 0 12 12" focusable="false">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.35"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M7.25 1.75H10v2.75M10 1.75 5.5 6.25M4.25 4.25H2v6.25h6.25V8.25"
+                />
+              </svg>
+            </span>
+          </a>
         </div>
       </form>
 

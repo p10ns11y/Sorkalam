@@ -315,7 +315,73 @@ function formatGlossaryTermHtml(translationText) {
   return safe;
 }
 
-// Main lookup handler
+// FUTURE: storage keys grokApiKey, grokipediaApiKey → fetch and render in #results
+
+function buildGrokUrl(word) {
+  return `https://grok.com/?q=${encodeURIComponent(word)}`;
+}
+
+function buildGrokipediaUrl(word) {
+  return `https://grokipedia.com/search?q=${encodeURIComponent(word)}`;
+}
+
+const EXTERNAL_PROVIDER_LABELS = {
+  grok: 'Grok',
+  grokipedia: 'Grokipedia',
+};
+
+const EXTERNAL_PROVIDER_DEFAULTS = {
+  grok: { href: 'https://grok.com/', build: buildGrokUrl },
+  grokipedia: {
+    href: 'https://grokipedia.com/search',
+    build: buildGrokipediaUrl,
+  },
+};
+
+let externalStatusTimer = null;
+
+/** Keep G/GP href + title in sync so hover shows full URL in the browser status bar. */
+function syncExternalProviderLinks() {
+  const wordInput = document.getElementById('word');
+  const searchWord = normalizeInput(wordInput?.value || '');
+
+  for (const [provider, config] of Object.entries(EXTERNAL_PROVIDER_DEFAULTS)) {
+    const linkEl = document.getElementById(
+      provider === 'grok' ? 'grok-btn' : 'gp-btn'
+    );
+    if (!linkEl) continue;
+
+    const url = searchWord ? config.build(searchWord) : config.href;
+    const label = EXTERNAL_PROVIDER_LABELS[provider];
+    linkEl.href = url;
+    linkEl.title = `${label} — ${url}`;
+    linkEl.setAttribute('aria-label', `${label} — ${url}`);
+  }
+}
+
+function openExternalLookup(provider) {
+  const wordInput = document.getElementById('word');
+  const searchWord = normalizeInput(wordInput.value);
+  if (!searchWord) return;
+
+  wordInput.value = searchWord;
+  setLanguageDirection(searchWord);
+  syncExternalProviderLinks();
+
+  const linkEl = document.getElementById(
+    provider === 'grok' ? 'grok-btn' : 'gp-btn'
+  );
+  const url = linkEl?.href || EXTERNAL_PROVIDER_DEFAULTS[provider]?.href;
+  if (!url || !searchWord) return;
+
+  chrome.tabs.create({ url, active: true });
+  const label = EXTERNAL_PROVIDER_LABELS[provider] || provider;
+  setStatus(`Opened in ${label}`);
+  if (externalStatusTimer) clearTimeout(externalStatusTimer);
+  externalStatusTimer = setTimeout(() => setStatus(''), 2500);
+}
+
+// Main lookup handler (in-popup: Wiktionary, Tamil VU)
 async function performLookup(lookupProvider) {
   const wordInput = document.getElementById('word');
   const searchWord = normalizeInput(wordInput.value);
@@ -323,7 +389,12 @@ async function performLookup(lookupProvider) {
 
   wordInput.value = searchWord;
   setLanguageDirection(searchWord);
+  syncExternalProviderLinks();
   clearResultsMeta();
+  if (externalStatusTimer) {
+    clearTimeout(externalStatusTimer);
+    externalStatusTimer = null;
+  }
 
   if (lookupProvider === 'wiki') {
     await lookupWiktionary(searchWord);
@@ -337,12 +408,17 @@ function initializePopup() {
   const wordInput = document.getElementById('word');
   const wikiBtn = document.getElementById('wiki-btn');
   const tvuBtn = document.getElementById('tvu-btn');
+  const grokBtn = document.getElementById('grok-btn');
+  const gpBtn = document.getElementById('gp-btn');
   const lookupForm = document.querySelector('.lookup-form');
 
   lookupForm?.addEventListener('submit', (e) => {
     e.preventDefault();
     performLookup('wiki');
   });
+
+  wordInput.addEventListener('input', syncExternalProviderLinks);
+  syncExternalProviderLinks();
 
   // Auto-focus
   wordInput.focus();
@@ -355,9 +431,16 @@ function initializePopup() {
     }
   });
 
-  // Button handlers
   wikiBtn.addEventListener('click', () => performLookup('wiki'));
   tvuBtn.addEventListener('click', () => performLookup('tvu'));
+  grokBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    openExternalLookup('grok');
+  });
+  gpBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    openExternalLookup('grokipedia');
+  });
 
   // Auto-lookup selected text via content script (works on all_urls pages)
   sendMessageAsync({ action: 'getSelectedWordFromPage' })
@@ -366,6 +449,7 @@ function initializePopup() {
       if (selectedWord) {
         wordInput.value = selectedWord;
         setLanguageDirection(selectedWord);
+        syncExternalProviderLinks();
         performLookup('wiki');
       }
     })
