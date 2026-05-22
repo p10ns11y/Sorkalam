@@ -15,7 +15,7 @@ const GlossaryCacheConfig = {
  * @property {string} cacheKey
  * @property {string} [glossaryPageHtml]
  * @property {{ columns: string[], rows: Record<string, string>[] }} [glossaryTable]
- * @property {{ english: string, tamil: string, subjectArea: string, row: Record<string, string> }[]} [glossaryEntries]
+ * @property {{ translationText: string, subjectArea: string, row: Record<string, string> }[]} [glossaryEntries]
  * @property {number} cachedAt
  * @property {number} expiresAt
  */
@@ -48,8 +48,8 @@ function openGlossaryCacheDb() {
 
 function buildTamilVuCacheKey(searchWord, glossarySearchColumn) {
   const normalizedWord = String(searchWord).trim().toLowerCase();
-  // v3: entries include both english and tamil for display
-  return `tamilvu:v3:${glossarySearchColumn}:${normalizedWord}`;
+  // v4: single translationText (opposite language from search)
+  return `tamilvu:v4:${glossarySearchColumn}:${normalizedWord}`;
 }
 
 function isExpired(record) {

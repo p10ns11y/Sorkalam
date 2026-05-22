@@ -152,7 +152,10 @@ async function lookupTamilVUGlossary(searchWord) {
       glossaryTable = TamilVUGlossaryParse.parseTamilVUGlossaryHtml(
         glossaryResponse.glossaryPageHtml
       );
-      glossaryEntries = TamilVUGlossaryParse.glossaryTableToEntries(glossaryTable);
+      glossaryEntries = TamilVUGlossaryParse.glossaryTableToEntries(
+        glossaryTable,
+        glossarySearchColumn
+      );
     }
     if (!glossaryEntries.length) {
       throw new Error('No glossary entries found in results table.');
@@ -216,6 +219,8 @@ function renderWiktionaryResults(htmlContent, word) {
 function renderTamilVUGlossary(glossaryEntries, searchWord, fromCache = false) {
   const resultsEl = document.getElementById('results');
   resultsEl.style.display = 'block';
+  const glossarySearchColumn =
+    currentLanguage === 'tamil' ? 'Tamil' : 'English';
 
   const cacheLabel = fromCache
     ? ' <span style="color:#888; font-weight:normal; font-size:0.85em;">(cached)</span>'
@@ -232,9 +237,13 @@ function renderTamilVUGlossary(glossaryEntries, searchWord, fromCache = false) {
     resultsHtml += `<li style="color:#c00;">No glossary entries found.</li>`;
   } else {
     for (const glossaryEntry of glossaryEntries) {
+      const translationText = resolveTamilVuTranslationText(
+        glossaryEntry,
+        glossarySearchColumn
+      );
       resultsHtml += `
         <li style="margin-bottom: 6px;">
-          ${formatTamilVuBilingualLine(glossaryEntry)}
+          ${escapeHtml(translationText)}
           <span style="color:#666; font-size:0.82em;">{ ${escapeHtml(glossaryEntry.subjectArea || '')} }</span>
         </li>
       `;
@@ -245,28 +254,12 @@ function renderTamilVUGlossary(glossaryEntries, searchWord, fromCache = false) {
   resultsEl.innerHTML = resultsHtml;
 }
 
-function formatTamilVuBilingualLine(glossaryEntry) {
-  let { english = '', tamil = '', translationText = '' } = glossaryEntry;
-  if (!english && !tamil && translationText) {
-    if (/[\u0B80-\u0BFF]/.test(translationText)) tamil = translationText;
-    else english = translationText;
-  }
-
-  const parts = [];
-  if (english) {
-    parts.push(
-      `<span class="glossary-en" lang="en">${escapeHtml(english)}</span>`
-    );
-  }
-  if (tamil) {
-    parts.push(
-      `<span class="glossary-ta" lang="ta">${escapeHtml(tamil)}</span>`
-    );
-  }
-  if (!parts.length) return escapeHtml(translationText || '—');
-  return parts.join(
-    ' <span style="color:#aaa; font-weight:normal;" aria-hidden="true">·</span> '
-  );
+/** Supports v4 entries; falls back if older cache rows stored english/tamil. */
+function resolveTamilVuTranslationText(glossaryEntry, glossarySearchColumn) {
+  if (glossaryEntry.translationText) return glossaryEntry.translationText;
+  const { english = '', tamil = '' } = glossaryEntry;
+  if (glossarySearchColumn === 'Tamil') return english || tamil;
+  return tamil || english;
 }
 
 function escapeHtml(text) {

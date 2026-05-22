@@ -6,8 +6,7 @@
  * @property {Record<string, string>[]} rows - One object per data row
  *
  * @typedef {Object} TamilVUGlossaryEntry
- * @property {string} english - English term from the table row
- * @property {string} tamil - Tamil term from the table row
+ * @property {string} translationText - Opposite language: Tamil if searched English, English if searched Tamil
  * @property {string} subjectArea
  * @property {Record<string, string>} row - Full row for traversal / future UI
  */
@@ -176,12 +175,21 @@ function extractEnglishTamilFromRow(row) {
   return { english: english.trim(), tamil: tamil.trim() };
 }
 
+/** English search → Tamil; Tamil search → English. */
+function pickTranslationText(english, tamil, glossarySearchColumn) {
+  if (glossarySearchColumn === 'Tamil') {
+    return english;
+  }
+  return tamil;
+}
+
 /**
- * Map structured rows to popup display entries (both languages per row).
+ * Map structured rows to popup display entries.
  * @param {TamilVUGlossaryTable} glossaryTable
+ * @param {'Tamil'|'English'} glossarySearchColumn
  * @returns {TamilVUGlossaryEntry[]}
  */
-function glossaryTableToEntries(glossaryTable) {
+function glossaryTableToEntries(glossaryTable, glossarySearchColumn) {
   const entries = [];
 
   for (const row of glossaryTable.rows) {
@@ -189,16 +197,23 @@ function glossaryTableToEntries(glossaryTable) {
       .replace(/Volume\s*-\s*\d+/i, '')
       .trim();
     const { english, tamil } = extractEnglishTamilFromRow(row);
+    const translationText = pickTranslationText(
+      english,
+      tamil,
+      glossarySearchColumn
+    );
 
-    if (/^English\s*$/i.test(english) && /^Subject\s*$/i.test(subjectArea)) {
+    if (/^English\s*$/i.test(translationText) && /^Subject\s*$/i.test(subjectArea)) {
       continue;
     }
 
-    const hasEnglish = english.length > 1 && english !== subjectArea;
-    const hasTamil = tamil.length > 1 && tamil !== subjectArea;
-    if (!hasEnglish && !hasTamil) continue;
-
-    entries.push({ english, tamil, subjectArea, row });
+    if (
+      translationText &&
+      translationText.length > 1 &&
+      translationText !== subjectArea
+    ) {
+      entries.push({ translationText, subjectArea, row });
+    }
   }
 
   return entries;
