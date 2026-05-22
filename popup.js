@@ -81,10 +81,26 @@ async function fetchJSON(url) {
   }
 }
 
+function setStatus(message, tone = '') {
+  const statusEl = document.getElementById('status');
+  statusEl.textContent = message;
+  statusEl.className = 'status-line';
+  if (tone) statusEl.classList.add(tone);
+}
+
+function clearResultsMeta() {
+  const metaEl = document.getElementById('results-meta');
+  if (metaEl) metaEl.innerHTML = '';
+}
+
+function renderResultsMeta(html) {
+  const metaEl = document.getElementById('results-meta');
+  if (metaEl) metaEl.innerHTML = html;
+}
+
 // Wiktionary lookup (modern async version)
 async function lookupWiktionary(word) {
-  const statusEl = document.getElementById('status');
-  statusEl.textContent = 'Searching Wiktionary...';
+  setStatus('Searching Wiktionary…', 'is-busy');
   
   try {
     const url = `https://${toLang}.wiktionary.org/w/api.php?action=parse&prop=text|revid|displaytitle&format=json&page=${encodeURIComponent(word)}&origin=*`;
@@ -93,20 +109,21 @@ async function lookupWiktionary(word) {
     
     if (data.parse && data.parse.text && data.parse.text['*']) {
       renderWiktionaryResults(data.parse.text['*'], word);
-      statusEl.textContent = '';
+      setStatus('');
     } else {
-      statusEl.textContent = 'No results found on Wiktionary';
+      renderResultsMessage('No results found on Wiktionary.');
+      setStatus('');
     }
   } catch (error) {
-    statusEl.textContent = 'Wiktionary lookup failed. Please try again.';
+    renderResultsMessage('Wiktionary lookup failed. Please try again.', true);
+    setStatus('', 'is-error');
     console.error(error);
   }
 }
 
 // Tamil VU technical glossary lookup
 async function lookupTamilVUGlossary(searchWord) {
-  const statusEl = document.getElementById('status');
-  statusEl.textContent = 'Searching Tamil VU Glossary...';
+  setStatus('Searching Tamil VU Glossary…', 'is-busy');
 
   try {
     const glossarySearchColumn =
@@ -120,7 +137,7 @@ async function lookupTamilVUGlossary(searchWord) {
       const cachedRecord = await GlossaryCache.getTamilVu(cacheKey);
       if (cachedRecord?.glossaryEntries?.length) {
         renderTamilVUGlossary(cachedRecord.glossaryEntries, searchWord, true);
-        statusEl.textContent = '';
+        setStatus('');
         return;
       }
     } catch (cacheReadError) {
@@ -178,26 +195,35 @@ async function lookupTamilVUGlossary(searchWord) {
       searchWord,
       Boolean(glossaryResponse.fromCache)
     );
-    statusEl.textContent = '';
+    setStatus('');
   } catch (lookupError) {
-    statusEl.textContent = lookupError.message;
+    renderResultsMessage(lookupError.message, true);
+    setStatus('');
     console.error(lookupError);
   }
 }
 
 // Render Wiktionary results (cleaned)
+function renderResultsMessage(message, isError = false) {
+  clearResultsMeta();
+  const resultsEl = document.getElementById('results');
+  resultsEl.innerHTML = `
+    <p class="result-message${isError ? ' result-message--error' : ''}">${escapeHtml(message)}</p>
+  `;
+}
+
 function renderWiktionaryResults(htmlContent, word) {
   const resultsEl = document.getElementById('results');
-  resultsEl.style.display = 'block';
   resultsEl.innerHTML = `
-    <div class="result-header">
-      <span class="language-badge">${fromLang.toUpperCase()} → ${toLang.toUpperCase()}</span>
-      <strong>${word}</strong>
-    </div>
-    <div class="result-content">
+    <div class="result-scroll result-content">
       ${htmlContent}
     </div>
   `;
+  renderResultsMeta(`
+    <strong class="meta-query">${escapeHtml(word)}</strong>
+    <span class="language-badge">${fromLang} → ${toLang}</span>
+    <span class="result-source">Wiktionary</span>
+  `);
   
   // Make internal links clickable for recursive search
   resultsEl.querySelectorAll('a').forEach(link => {
@@ -218,40 +244,47 @@ function renderWiktionaryResults(htmlContent, word) {
 // Render Tamil VU glossary rows (parsed in service worker)
 function renderTamilVUGlossary(glossaryEntries, searchWord, fromCache = false) {
   const resultsEl = document.getElementById('results');
-  resultsEl.style.display = 'block';
   const glossarySearchColumn =
     currentLanguage === 'tamil' ? 'Tamil' : 'English';
 
-  const cacheLabel = fromCache
-    ? ' <span style="color:#888; font-weight:normal; font-size:0.85em;">(cached)</span>'
+  const cacheBadge = fromCache
+    ? '<span class="cache-badge">Cached</span>'
     : '';
 
-  let resultsHtml = `
-    <div class="result-header">
-      <strong>${escapeHtml(searchWord)}</strong> — Tamil VU Glossary${cacheLabel}
-    </div>
-    <ol style="padding-left:18px; margin:6px 0 0 0; line-height:1.4;">
-  `;
+  let listHtml = '';
 
   if (!glossaryEntries?.length) {
-    resultsHtml += `<li style="color:#c00;">No glossary entries found.</li>`;
+    listHtml =
+      '<li class="glossary-item glossary-item--empty">No glossary entries found.</li>';
   } else {
     for (const glossaryEntry of glossaryEntries) {
       const translationText = resolveTamilVuTranslationText(
         glossaryEntry,
         glossarySearchColumn
       );
-      resultsHtml += `
-        <li style="margin-bottom: 6px;">
-          ${escapeHtml(translationText)}
-          <span style="color:#666; font-size:0.82em;">{ ${escapeHtml(glossaryEntry.subjectArea || '')} }</span>
+      const subject = glossaryEntry.subjectArea
+        ? `<span class="glossary-subject">${escapeHtml(glossaryEntry.subjectArea)}</span>`
+        : '';
+      const termHtml = formatGlossaryTermHtml(translationText);
+      listHtml += `
+        <li class="glossary-item">
+          <span class="glossary-term">${termHtml}</span>
+          ${subject}
         </li>
       `;
     }
   }
 
-  resultsHtml += `</ol>`;
-  resultsEl.innerHTML = resultsHtml;
+  resultsEl.innerHTML = `
+    <div class="result-scroll">
+      <ol class="glossary-list">${listHtml}</ol>
+    </div>
+  `;
+  renderResultsMeta(`
+    <strong class="meta-query">${escapeHtml(searchWord)}</strong>
+    <span class="result-source">Tamil VU Glossary</span>
+    ${cacheBadge}
+  `);
 }
 
 /** Supports v4 entries; falls back if older cache rows stored english/tamil. */
@@ -270,6 +303,18 @@ function escapeHtml(text) {
     .replace(/"/g, '&quot;');
 }
 
+/** Wrap Tamil translation text for font selection and screen readers. */
+function formatGlossaryTermHtml(translationText) {
+  const safe = escapeHtml(translationText);
+  if (currentLanguage === 'english') {
+    return `<span lang="ta">${safe}</span>`;
+  }
+  if (currentLanguage === 'tamil') {
+    return `<span lang="en">${safe}</span>`;
+  }
+  return safe;
+}
+
 // Main lookup handler
 async function performLookup(lookupProvider) {
   const wordInput = document.getElementById('word');
@@ -278,7 +323,7 @@ async function performLookup(lookupProvider) {
 
   wordInput.value = searchWord;
   setLanguageDirection(searchWord);
-  document.getElementById('results').style.display = 'none';
+  clearResultsMeta();
 
   if (lookupProvider === 'wiki') {
     await lookupWiktionary(searchWord);
@@ -292,14 +337,21 @@ function initializePopup() {
   const wordInput = document.getElementById('word');
   const wikiBtn = document.getElementById('wiki-btn');
   const tvuBtn = document.getElementById('tvu-btn');
+  const lookupForm = document.querySelector('.lookup-form');
+
+  lookupForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    performLookup('wiki');
+  });
 
   // Auto-focus
   wordInput.focus();
 
-  // Enter key support (modern-web-guidance form patterns)
+  // Enter in search field (form submit also triggers wiki lookup)
   wordInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-      performLookup('wiki'); // Default to Wiktionary on Enter
+      e.preventDefault();
+      performLookup('wiki');
     }
   });
 

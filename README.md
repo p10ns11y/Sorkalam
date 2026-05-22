@@ -7,7 +7,8 @@
 > **Still on the old Web Store build (MV2)?** See [TECH_DETAILS.md — Still using Manifest V2](TECH_DETAILS.md#still-using-the-manifest-v2-v55-build) (extension ID `jacclialpnbekableeihpjnojebafhho`, archived listing, or v5.5 source at [github.com/p10ns11y/sorkalam-extension/tree/v5-legacy](https://github.com/p10ns11y/sorkalam-extension/tree/v5-legacy) in dev mode).
 
 <p align="center">
-  <img src="logo-150-50.png" alt="சொற்களம் logo" width="200">
+  <img src="logo.svg" alt="" width="32" height="32" style="vertical-align:middle">
+  <strong lang="ta" style="font-size:1.35rem;vertical-align:middle">சொற்களம்</strong>
 </p>
 
 ---
@@ -192,7 +193,7 @@ sorkalam-extension/
 ├── .cursor/skills/sorkalam/   # Lean Cursor skill for this extension (4 files)
 ├── images/                # README screenshots and store archive (PNG)
 ├── icon.png
-├── logo-150-50.png
+├── logo.svg
 ├── TECH_DETAILS_V6.md    # v6.0 technical reference (current)
 ├── TECH_DETAILS.md       # Legacy v5.x technical reference
 ├── CHANGELOG.md
