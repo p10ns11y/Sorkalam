@@ -142,7 +142,8 @@ sequenceDiagram
   Popup->>SW: sendMessage({ action: 'fetchTamilVUGlossary', searchWord, glossarySearchColumn })
   SW->>TVU: fetch(glossarySearchUrl)
   TVU-->>SW: HTML
-  SW-->>Popup: { ok: true, glossaryEntries }
+  SW-->>Popup: { ok: true, glossaryPageHtml }
+  Popup->>Popup: parse table → { columns, rows } → glossaryEntries
   Popup->>Popup: renderTamilVUGlossary(glossaryEntries)
 ```
 
@@ -170,6 +171,7 @@ sorkalam-extension/
 ├── manifest.json          # MV3 configuration
 ├── popup.html             # Main popup UI
 ├── popup.js               # Core lookup logic
+├── tamilvu-glossary-parse.js  # Tamil VU HTML table → JSON (DOMParser)
 ├── event.js               # Service worker (selection relay)
 ├── content.js             # Page selection capture
 ├── css/

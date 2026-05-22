@@ -88,7 +88,7 @@ https://www.tamilvu.org/slet/technical_glossary/tech_engser.jsp
 ```
 
 - **Availability**: The glossary endpoint is sometimes **temporarily down or very slow** (not an extension bug). When it recovers, the same URL works in Brave and in Sorkalam.
-- **Fetch path**: Popup sends `{ action: 'fetchTamilVUGlossary', searchWord, glossarySearchColumn }`. The service worker fetches **HTTPS only**, then a **hidden-tab fallback** if needed. Returns `{ ok, glossaryEntries }` (parsed in the SW).
+- **Fetch path**: Popup sends `{ action: 'fetchTamilVUGlossary', searchWord, glossarySearchColumn }`. The service worker fetches **HTTPS only**, then a **hidden-tab fallback** if needed. Returns `{ ok, glossaryPageHtml }`. The popup parses HTML with `DOMParser` in [`tamilvu-glossary-parse.js`](tamilvu-glossary-parse.js) → `{ columns, rows }` JSON, then maps rows to display entries.
 
 ```mermaid
 sequenceDiagram
@@ -99,14 +99,15 @@ sequenceDiagram
   Popup->>SW: sendMessage({ action: 'fetchTamilVUGlossary', searchWord, glossarySearchColumn })
   SW->>TVU: fetch(glossarySearchUrl)
   TVU-->>SW: HTML
-  SW-->>Popup: { ok: true, glossaryEntries }
+  SW-->>Popup: { ok: true, glossaryPageHtml }
+  Popup->>Popup: parseTamilVUGlossaryHtml → { columns, rows }
   Popup->>Popup: renderTamilVUGlossary(glossaryEntries)
 ```
 
-- **Processing** (`fetchTamilVUGlossary` in `event.js` parses HTML; popup `renderTamilVUGlossary` renders):
-  - Regex table parse in the service worker (no `DOMParser` in MV3 service workers)
-  - For each table row: detect Tamil in cells; prefer Tamil cell as **term**, column 2 as **subject**
-  - Fallback to legacy column indices (3, 4, 2) when no Tamil script in row
+- **Processing** (`tamilvu-glossary-parse.js` in the popup; `event.js` only fetches HTML):
+  - `DOMParser` → results table with header row (`English`, `Subject`, …) → **`{ columns, rows }`**
+  - Each `row` is a plain object, e.g. `{ slNo, english, tamil, subject, volume }`
+  - `glossaryTableToEntries()` picks **translationText** (Tamil when searching English) and **subjectArea** for the list UI; keeps full `row` on each entry for traversal
   - Renders ordered list with `{ subject }` suffix
 - **Errors**: Network or HTTP failures return `{ ok: false, error }`; the popup shows a message in `#status`.
 
@@ -149,6 +150,7 @@ Selection and content scripts do not run on `brave://`, `chrome://`, extension s
 
 ```
 popup.js       detectLanguage, lookupWiktionary, lookupTamilVU, performLookup, initializePopup
+tamilvu-glossary-parse.js  DOMParser table → { columns, rows }; glossaryTableToEntries
 content.js     lastCapturedSelection cache, getSelectedWord message handler
 event.js       getSelectedWordFromPage relay, Tamil VU glossary fetch
 manifest.json  MV3 config

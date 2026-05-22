@@ -126,7 +126,26 @@ async function lookupTamilVUGlossary(searchWord) {
       throw lookupError;
     }
 
-    renderTamilVUGlossary(glossaryResponse.glossaryEntries, searchWord);
+    let glossaryEntries = glossaryResponse.glossaryEntries;
+    if (!glossaryEntries?.length) {
+      if (!glossaryResponse.glossaryPageHtml) {
+        throw new Error(
+          'No glossary HTML received. Reload the extension at brave://extensions.'
+        );
+      }
+      const glossaryTable = TamilVUGlossaryParse.parseTamilVUGlossaryHtml(
+        glossaryResponse.glossaryPageHtml
+      );
+      glossaryEntries = TamilVUGlossaryParse.glossaryTableToEntries(
+        glossaryTable,
+        glossarySearchColumn
+      );
+    }
+    if (!glossaryEntries.length) {
+      throw new Error('No glossary entries found in results table.');
+    }
+
+    renderTamilVUGlossary(glossaryEntries, searchWord);
     statusEl.textContent = '';
   } catch (lookupError) {
     statusEl.textContent = lookupError.message;

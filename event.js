@@ -51,54 +51,6 @@ function buildTamilVUGlossarySearchUrl(searchWord, glossarySearchColumn) {
   return `https://www.tamilvu.org/slet/technical_glossary/tech_engser.jsp?${query}`;
 }
 
-function stripHtmlTags(rawHtml) {
-  return rawHtml.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
-}
-
-/** Parse Tamil VU glossary results table (split-based; safe for large pages in SW). */
-function parseTamilVUGlossaryHtml(glossaryPageHtml) {
-  const glossaryEntries = [];
-  const tableRowHtmlSegments = glossaryPageHtml.split(/<tr\b/i);
-
-  for (
-    let rowIndex = 1;
-    rowIndex < tableRowHtmlSegments.length && glossaryEntries.length < 300;
-    rowIndex++
-  ) {
-    const tableRowHtml = tableRowHtmlSegments[rowIndex].split(/<\/tr>/i)[0];
-    const tableCellHtmlSegments = tableRowHtml.split(/<td\b/i);
-    const columnTexts = [];
-
-    for (let cellIndex = 1; cellIndex < tableCellHtmlSegments.length; cellIndex++) {
-      const tableCellHtml = tableCellHtmlSegments[cellIndex].split(/<\/td>/i)[0];
-      columnTexts.push(stripHtmlTags(tableCellHtml));
-    }
-    if (columnTexts.length < 3) continue;
-
-    let translationText = '';
-    const rowContainsTamil = columnTexts.some((columnText) =>
-      /[\u0B80-\u0BFF]/.test(columnText)
-    );
-
-    if (rowContainsTamil) {
-      translationText =
-        columnTexts.find((columnText) => /[\u0B80-\u0BFF]/.test(columnText)) || '';
-    } else {
-      translationText = columnTexts[3] || columnTexts[4] || columnTexts[2] || '';
-    }
-
-    let subjectArea = columnTexts[2] || columnTexts[1] || '';
-    subjectArea = subjectArea.replace(/Volume\s*-\s*\d+/i, '').trim() || subjectArea;
-    translationText = stripHtmlTags(translationText);
-
-    if (translationText && translationText.length > 2 && translationText !== subjectArea) {
-      glossaryEntries.push({ translationText, subjectArea });
-    }
-  }
-
-  return glossaryEntries;
-}
-
 async function fetchGlossaryPageHtml(glossarySearchUrl, timeoutMs) {
   const abortController = new AbortController();
   const abortTimerId = setTimeout(() => abortController.abort(), timeoutMs);
@@ -172,9 +124,10 @@ async function fetchTamilVUGlossary(searchWord, glossarySearchColumn) {
 
   try {
     const glossaryPageHtml = await fetchGlossaryPageHtml(glossarySearchUrl, 35000);
-    const glossaryEntries = parseTamilVUGlossaryHtml(glossaryPageHtml);
-    if (glossaryEntries.length) return { ok: true, glossaryEntries };
-    failureReasons.push('fetch returned no glossary rows');
+    if (glossaryPageHtml?.length > 100) {
+      return { ok: true, glossaryPageHtml };
+    }
+    failureReasons.push('fetch returned empty glossary page');
   } catch (fetchError) {
     const reason =
       fetchError.name === 'AbortError' ? 'fetch timed out' : fetchError.message;
@@ -187,9 +140,10 @@ async function fetchTamilVUGlossary(searchWord, glossarySearchColumn) {
       glossarySearchUrl,
       45000
     );
-    const glossaryEntries = parseTamilVUGlossaryHtml(glossaryPageHtml);
-    if (glossaryEntries.length) return { ok: true, glossaryEntries };
-    failureReasons.push('hidden tab returned no glossary rows');
+    if (glossaryPageHtml?.length > 100) {
+      return { ok: true, glossaryPageHtml };
+    }
+    failureReasons.push('hidden tab returned empty glossary page');
   } catch (tabFallbackError) {
     failureReasons.push(`hidden tab: ${tabFallbackError.message}`);
     console.warn('[Sorkalam] Tamil VU tab fallback:', tabFallbackError);

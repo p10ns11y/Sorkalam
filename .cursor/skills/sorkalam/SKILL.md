@@ -14,6 +14,7 @@ Vanilla MV3 extension: Wiktionary + Tamil VU glossary. No frameworks in the acti
 | File | Role |
 |------|------|
 | `popup.js` | UI, Wiktionary fetch, Tamil VU via `sendMessage`, `normalizeInput()` |
+| `tamilvu-glossary-parse.js` | HTML table → `{ columns, rows }` JSON via `DOMParser` (popup only) |
 | `event.js` | Service worker: selection relay, Tamil VU HTTPS fetch + hidden-tab fallback |
 | `content.js` | `lastCapturedSelection`, answers `getSelectedWord` |
 | `manifest.json` | MV3 permissions, `<all_urls>` content script |
@@ -26,9 +27,9 @@ Full architecture: [TECH_DETAILS_V6.md](../../../TECH_DETAILS_V6.md).
 |--------|-------------------|----------|
 | `getSelectedWordFromPage` | popup → `event.js` | `{ selectedWord }` |
 | `getSelectedWord` | `event.js` → content script | `{ selectedWord }` |
-| `fetchTamilVUGlossary` | popup → `event.js` | `{ ok, glossaryEntries }` or `{ ok: false, error, glossarySearchUrl }` |
+| `fetchTamilVUGlossary` | popup → `event.js` | `{ ok, glossaryPageHtml }` or `{ ok: false, error, glossarySearchUrl }` |
 
-`glossaryEntries[]`: `{ translationText, subjectArea }`.
+Popup: `parseTamilVUGlossaryHtml` → `{ columns, rows }`; `glossaryTableToEntries` → `{ translationText, subjectArea, row }[]`.
 
 ## Rules for changes
 
