@@ -1,6 +1,6 @@
 # SORKALAM (சொற்களம்)
 
-**Tamil ↔ English Dictionary & Technical Glossary** — Modern Manifest V3 Edition
+****Tamil ↔ English Dictionary, Thesaurus & Technical Glossary** — Modern Manifest V3 Edition** — Modern Manifest V3 Edition
 
 > **Note**: This is a **developer/modernized version (v6.0)** primarily intended for **local testing in Brave (or Chrome) Developer Mode**. It is **not currently optimized for Chrome Web Store publication** (though it can be published later with minor changes).
 >
@@ -11,7 +11,6 @@
 </p>
 
 ---
-
 ## Features
 
 - 🔍 **Wiktionary** lookup (English ↔ Tamil)
@@ -20,6 +19,36 @@
 - ⚡ Auto-lookup of selected text when opening the extension
 - 🔗 Clickable results for quick follow-up searches
 - 🎨 Modern, lightweight UI (no jQuery)
+
+---
+
+## 🕰️ The Time Traveler's Story
+
+> **2014 → 2026**  
+> A time traveler from the future meets the original Sorkalam.
+
+In **2014**, a developer created *Sorkalam* with a simple dream:  
+**“Let Tamil learners tap any word and instantly understand it — without ever leaving the browser tab.”**
+
+No new tabs. No distraction. Just pure, focused learning.
+
+Ten years later, a time traveler arrived from **2026**. They opened the old code, smiled, and said:
+
+> “The heart is still beating.  
+> Only the clothes have changed.”
+
+They modernized everything — Manifest V3, clean vanilla JavaScript, beautiful new UI, faster performance — but kept the original promise intact:
+
+- Instant glossary/thesaurus lookup  
+- No context switching  
+- Deep respect for the learner’s focus
+
+Just like how **Grok** on X lets you tap **any post** and dive deeper without leaving your timeline, *Sorkalam* does the same for Tamil technical terms.
+
+The time traveler left behind only one message before disappearing:
+
+> “Some tools are not just software.  
+> They are quiet bridges between generations of curious minds.”
 
 ---
 
