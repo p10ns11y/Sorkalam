@@ -88,6 +88,16 @@ function setStatus(message, tone = '') {
   if (tone) statusEl.classList.add(tone);
 }
 
+function clearResultsMeta() {
+  const metaEl = document.getElementById('results-meta');
+  if (metaEl) metaEl.innerHTML = '';
+}
+
+function renderResultsMeta(html) {
+  const metaEl = document.getElementById('results-meta');
+  if (metaEl) metaEl.innerHTML = html;
+}
+
 // Wiktionary lookup (modern async version)
 async function lookupWiktionary(word) {
   setStatus('Searching Wiktionary…', 'is-busy');
@@ -195,6 +205,7 @@ async function lookupTamilVUGlossary(searchWord) {
 
 // Render Wiktionary results (cleaned)
 function renderResultsMessage(message, isError = false) {
+  clearResultsMeta();
   const resultsEl = document.getElementById('results');
   resultsEl.innerHTML = `
     <p class="result-message${isError ? ' result-message--error' : ''}">${escapeHtml(message)}</p>
@@ -204,14 +215,15 @@ function renderResultsMessage(message, isError = false) {
 function renderWiktionaryResults(htmlContent, word) {
   const resultsEl = document.getElementById('results');
   resultsEl.innerHTML = `
-    <div class="result-header">
-      <span class="language-badge">${fromLang} → ${toLang}</span>
-      <strong>${escapeHtml(word)}</strong>
-    </div>
     <div class="result-scroll result-content">
       ${htmlContent}
     </div>
   `;
+  renderResultsMeta(`
+    <strong class="meta-query">${escapeHtml(word)}</strong>
+    <span class="language-badge">${fromLang} → ${toLang}</span>
+    <span class="result-source">Wiktionary</span>
+  `);
   
   // Make internal links clickable for recursive search
   resultsEl.querySelectorAll('a').forEach(link => {
@@ -253,9 +265,10 @@ function renderTamilVUGlossary(glossaryEntries, searchWord, fromCache = false) {
       const subject = glossaryEntry.subjectArea
         ? `<span class="glossary-subject">${escapeHtml(glossaryEntry.subjectArea)}</span>`
         : '';
+      const termHtml = formatGlossaryTermHtml(translationText);
       listHtml += `
         <li class="glossary-item">
-          <span class="glossary-term">${escapeHtml(translationText)}</span>
+          <span class="glossary-term">${termHtml}</span>
           ${subject}
         </li>
       `;
@@ -263,15 +276,15 @@ function renderTamilVUGlossary(glossaryEntries, searchWord, fromCache = false) {
   }
 
   resultsEl.innerHTML = `
-    <div class="result-header">
-      <strong>${escapeHtml(searchWord)}</strong>
-      <span class="result-source">Tamil VU Glossary</span>
-      ${cacheBadge}
-    </div>
     <div class="result-scroll">
       <ol class="glossary-list">${listHtml}</ol>
     </div>
   `;
+  renderResultsMeta(`
+    <strong class="meta-query">${escapeHtml(searchWord)}</strong>
+    <span class="result-source">Tamil VU Glossary</span>
+    ${cacheBadge}
+  `);
 }
 
 /** Supports v4 entries; falls back if older cache rows stored english/tamil. */
@@ -290,6 +303,18 @@ function escapeHtml(text) {
     .replace(/"/g, '&quot;');
 }
 
+/** Wrap Tamil translation text for font selection and screen readers. */
+function formatGlossaryTermHtml(translationText) {
+  const safe = escapeHtml(translationText);
+  if (currentLanguage === 'english') {
+    return `<span lang="ta">${safe}</span>`;
+  }
+  if (currentLanguage === 'tamil') {
+    return `<span lang="en">${safe}</span>`;
+  }
+  return safe;
+}
+
 // Main lookup handler
 async function performLookup(lookupProvider) {
   const wordInput = document.getElementById('word');
@@ -298,6 +323,7 @@ async function performLookup(lookupProvider) {
 
   wordInput.value = searchWord;
   setLanguageDirection(searchWord);
+  clearResultsMeta();
 
   if (lookupProvider === 'wiki') {
     await lookupWiktionary(searchWord);
@@ -311,14 +337,21 @@ function initializePopup() {
   const wordInput = document.getElementById('word');
   const wikiBtn = document.getElementById('wiki-btn');
   const tvuBtn = document.getElementById('tvu-btn');
+  const lookupForm = document.querySelector('.lookup-form');
+
+  lookupForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    performLookup('wiki');
+  });
 
   // Auto-focus
   wordInput.focus();
 
-  // Enter key support (modern-web-guidance form patterns)
+  // Enter in search field (form submit also triggers wiki lookup)
   wordInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-      performLookup('wiki'); // Default to Wiktionary on Enter
+      e.preventDefault();
+      performLookup('wiki');
     }
   });
 

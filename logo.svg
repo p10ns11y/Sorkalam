@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 32" role="img" aria-label="Sorkalam">
+  <rect x="0" y="2" width="28" height="28" rx="7" fill="#9a4e28"/>
+  <path
+    d="M9 16h4.5M11.25 13.25 14 16l-2.75 2.75M19 16h-4.5M16.75 13.25 14 16l2.75 2.75"
+    fill="none"
+    stroke="#fff"
+    stroke-width="1.6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

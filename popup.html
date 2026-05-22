@@ -8,36 +8,53 @@
 </head>
 <body class="app">
   <div class="app-shell">
-  <div class="lookup-strip">
-    <header class="app-header">
-      <img
-        src="logo-150-50.png"
-        alt="சொற்களம்"
-        class="app-logo"
-        width="120"
-        height="40"
-      >
-    </header>
+    <div class="lookup-strip">
+      <form class="lookup-form" role="search">
+        <label class="search-field" for="word">
+          <span class="sr-only">Search word</span>
+          <input
+            type="search"
+            id="word"
+            name="word"
+            placeholder="தமிழ் or English…"
+            autocomplete="off"
+            spellcheck="false"
+          >
+        </label>
 
-    <label class="search-field" for="word">
-      <input
-        type="text"
-        id="word"
-        placeholder="தமிழ் or English…"
-        autocomplete="off"
-        spellcheck="false"
-      >
-    </label>
+        <div class="action-row">
+          <button
+            type="button"
+            id="wiki-btn"
+            class="btn btn-wiki"
+            aria-label="Look up on Wiktionary"
+          >Wiktionary</button>
+          <button
+            type="button"
+            id="tvu-btn"
+            class="btn btn-tvu"
+            aria-label="Look up on Tamil VU glossary"
+          >Tamil VU</button>
+        </div>
+      </form>
 
-    <div class="action-row">
-      <button type="button" id="wiki-btn" class="btn btn-wiki">Wiktionary</button>
-      <button type="button" id="tvu-btn" class="btn btn-tvu">Tamil VU</button>
+      <p id="status" class="status-line" role="status" aria-live="polite"></p>
     </div>
 
-    <p id="status" class="status-line" role="status" aria-live="polite"></p>
-  </div>
+    <section id="results" class="results-panel" aria-live="polite"></section>
+    <div id="results-meta" class="results-meta" aria-live="polite"></div>
 
-  <section id="results" class="results-panel" aria-live="polite"></section>
+    <footer class="app-footer" aria-label="சொற்களம்">
+      <img
+        src="logo.svg"
+        alt=""
+        class="app-mark"
+        width="28"
+        height="32"
+        aria-hidden="true"
+      >
+      <span class="app-wordmark" lang="ta">சொற்களம்</span>
+    </footer>
   </div>
 
   <script src="glossary-cache.js"></script>
