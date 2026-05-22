@@ -1,6 +1,8 @@
 // Sorkalam - Service Worker (Manifest V3)
 // Relays selected text and fetches Tamil VU (host_permissions bypass popup CORS)
 
+importScripts('glossary-cache.js');
+
 const TAMIL_VU_FETCH_HEADERS = {
   Accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8',
   'Accept-Language': 'en-US,en;q=0.9,ta;q=0.8',
@@ -10,6 +12,9 @@ const TAMIL_VU_FETCH_HEADERS = {
 
 chrome.runtime.onInstalled.addListener(() => {
   console.log('[Sorkalam] Extension installed/updated (v6.0 - Modern MV3)');
+  GlossaryCache.pruneTamilVuCache().catch((err) =>
+    console.warn('[Sorkalam] glossary cache prune:', err)
+  );
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
@@ -120,12 +125,35 @@ async function fetchTamilVUGlossary(searchWord, glossarySearchColumn) {
     searchWord,
     glossarySearchColumn
   );
+  const cacheKey = GlossaryCache.buildTamilVuCacheKey(
+    searchWord,
+    glossarySearchColumn
+  );
   const failureReasons = [];
+
+  try {
+    const cachedRecord = await GlossaryCache.getTamilVu(cacheKey);
+    if (cachedRecord?.glossaryPageHtml?.length > 100) {
+      return {
+        ok: true,
+        glossaryPageHtml: cachedRecord.glossaryPageHtml,
+        fromCache: true,
+        cacheKey,
+      };
+    }
+  } catch (cacheReadError) {
+    console.warn('[Sorkalam] Tamil VU cache read:', cacheReadError);
+  }
 
   try {
     const glossaryPageHtml = await fetchGlossaryPageHtml(glossarySearchUrl, 35000);
     if (glossaryPageHtml?.length > 100) {
-      return { ok: true, glossaryPageHtml };
+      try {
+        await GlossaryCache.setTamilVu({ cacheKey, glossaryPageHtml });
+      } catch (cacheWriteError) {
+        console.warn('[Sorkalam] Tamil VU cache write:', cacheWriteError);
+      }
+      return { ok: true, glossaryPageHtml, fromCache: false, cacheKey };
     }
     failureReasons.push('fetch returned empty glossary page');
   } catch (fetchError) {
@@ -141,7 +169,12 @@ async function fetchTamilVUGlossary(searchWord, glossarySearchColumn) {
       45000
     );
     if (glossaryPageHtml?.length > 100) {
-      return { ok: true, glossaryPageHtml };
+      try {
+        await GlossaryCache.setTamilVu({ cacheKey, glossaryPageHtml });
+      } catch (cacheWriteError) {
+        console.warn('[Sorkalam] Tamil VU cache write:', cacheWriteError);
+      }
+      return { ok: true, glossaryPageHtml, fromCache: false, cacheKey };
     }
     failureReasons.push('hidden tab returned empty glossary page');
   } catch (tabFallbackError) {

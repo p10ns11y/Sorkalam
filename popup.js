@@ -111,6 +111,21 @@ async function lookupTamilVUGlossary(searchWord) {
   try {
     const glossarySearchColumn =
       currentLanguage === 'tamil' ? 'Tamil' : 'English';
+    const cacheKey = GlossaryCache.buildTamilVuCacheKey(
+      searchWord,
+      glossarySearchColumn
+    );
+
+    try {
+      const cachedRecord = await GlossaryCache.getTamilVu(cacheKey);
+      if (cachedRecord?.glossaryEntries?.length) {
+        renderTamilVUGlossary(cachedRecord.glossaryEntries, searchWord, true);
+        statusEl.textContent = '';
+        return;
+      }
+    } catch (cacheReadError) {
+      console.warn('[Sorkalam] Tamil VU parsed cache read:', cacheReadError);
+    }
 
     const glossaryResponse = await sendMessageAsync(
       {
@@ -127,13 +142,14 @@ async function lookupTamilVUGlossary(searchWord) {
     }
 
     let glossaryEntries = glossaryResponse.glossaryEntries;
+    let glossaryTable = null;
     if (!glossaryEntries?.length) {
       if (!glossaryResponse.glossaryPageHtml) {
         throw new Error(
           'No glossary HTML received. Reload the extension at brave://extensions.'
         );
       }
-      const glossaryTable = TamilVUGlossaryParse.parseTamilVUGlossaryHtml(
+      glossaryTable = TamilVUGlossaryParse.parseTamilVUGlossaryHtml(
         glossaryResponse.glossaryPageHtml
       );
       glossaryEntries = TamilVUGlossaryParse.glossaryTableToEntries(
@@ -145,7 +161,23 @@ async function lookupTamilVUGlossary(searchWord) {
       throw new Error('No glossary entries found in results table.');
     }
 
-    renderTamilVUGlossary(glossaryEntries, searchWord);
+    const responseCacheKey = glossaryResponse.cacheKey || cacheKey;
+    try {
+      await GlossaryCache.setTamilVu({
+        cacheKey: responseCacheKey,
+        glossaryPageHtml: glossaryResponse.glossaryPageHtml,
+        glossaryTable,
+        glossaryEntries,
+      });
+    } catch (cacheWriteError) {
+      console.warn('[Sorkalam] Tamil VU parsed cache write:', cacheWriteError);
+    }
+
+    renderTamilVUGlossary(
+      glossaryEntries,
+      searchWord,
+      Boolean(glossaryResponse.fromCache)
+    );
     statusEl.textContent = '';
   } catch (lookupError) {
     statusEl.textContent = lookupError.message;
@@ -184,13 +216,17 @@ function renderWiktionaryResults(htmlContent, word) {
 }
 
 // Render Tamil VU glossary rows (parsed in service worker)
-function renderTamilVUGlossary(glossaryEntries, searchWord) {
+function renderTamilVUGlossary(glossaryEntries, searchWord, fromCache = false) {
   const resultsEl = document.getElementById('results');
   resultsEl.style.display = 'block';
 
+  const cacheLabel = fromCache
+    ? ' <span style="color:#888; font-weight:normal; font-size:0.85em;">(cached)</span>'
+    : '';
+
   let resultsHtml = `
     <div class="result-header">
-      <strong>${escapeHtml(searchWord)}</strong> — Tamil VU Glossary
+      <strong>${escapeHtml(searchWord)}</strong> — Tamil VU Glossary${cacheLabel}
     </div>
     <ol style="padding-left:18px; margin:6px 0 0 0; line-height:1.4;">
   `;

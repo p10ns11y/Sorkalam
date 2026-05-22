@@ -14,8 +14,9 @@ Vanilla MV3 extension: Wiktionary + Tamil VU glossary. No frameworks in the acti
 | File | Role |
 |------|------|
 | `popup.js` | UI, Wiktionary fetch, Tamil VU via `sendMessage`, `normalizeInput()` |
+| `glossary-cache.js` | IndexedDB cache for Tamil VU HTML + parsed entries (popup + SW) |
 | `tamilvu-glossary-parse.js` | HTML table → `{ columns, rows }` JSON via `DOMParser` (popup only) |
-| `event.js` | Service worker: selection relay, Tamil VU HTTPS fetch + hidden-tab fallback |
+| `event.js` | Service worker: selection relay, Tamil VU fetch + IDB HTML cache |
 | `content.js` | `lastCapturedSelection`, answers `getSelectedWord` |
 | `manifest.json` | MV3 permissions, `<all_urls>` content script |
 
@@ -27,9 +28,9 @@ Full architecture: [TECH_DETAILS_V6.md](../../../TECH_DETAILS_V6.md).
 |--------|-------------------|----------|
 | `getSelectedWordFromPage` | popup → `event.js` | `{ selectedWord }` |
 | `getSelectedWord` | `event.js` → content script | `{ selectedWord }` |
-| `fetchTamilVUGlossary` | popup → `event.js` | `{ ok, glossaryPageHtml }` or `{ ok: false, error, glossarySearchUrl }` |
+| `fetchTamilVUGlossary` | popup → `event.js` | `{ ok, glossaryPageHtml, fromCache?, cacheKey }` or error |
 
-Popup: `parseTamilVUGlossaryHtml` → `{ columns, rows }`; `glossaryTableToEntries` → `{ translationText, subjectArea, row }[]`.
+Popup: check `GlossaryCache.getTamilVu` for `glossaryEntries` first; else parse HTML and `setTamilVu` with table + entries. SW caches HTML on network fetch. Flow diagram: [TECH_DETAILS_V6.md — Tamil VU Glossary](../../../TECH_DETAILS_V6.md#lookup-tamil-vu-glossary).
 
 ## Rules for changes
 
